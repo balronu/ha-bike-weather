@@ -1,0 +1,69 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Bike Weather",
+        "description": "Set up bike weather scoring with OpenWeatherMap.",
+        "data": {
+          "name": "Name",
+          "api_key": "OpenWeatherMap API key",
+          "latitude": "Latitude",
+          "longitude": "Longitude",
+          "language": "Language"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not fetch the OpenWeatherMap forecast."
+    },
+    "abort": {
+      "already_configured": "This location is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Bike Weather options",
+        "data": {
+          "scan_interval": "Update interval in minutes",
+          "min_good_score": "Minimum score for good cycling weather",
+          "ideal_temp_min": "Ideal minimum temperature",
+          "ideal_temp_max": "Ideal maximum temperature",
+          "acceptable_temp_min": "Acceptable minimum temperature",
+          "acceptable_temp_max": "Acceptable maximum temperature",
+          "max_rain": "Maximum rain in mm per 3 hours",
+          "max_pop": "Maximum precipitation probability in %",
+          "max_wind": "Maximum wind in m/s",
+          "max_gust": "Maximum gust in m/s"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "recommendation": {
+        "name": "Recommendation",
+        "state": {
+          "good": "Good",
+          "ok": "Okay",
+          "bad": "Bad"
+        }
+      },
+      "score": {
+        "name": "Score"
+      },
+      "next_good_time": {
+        "name": "Next good time"
+      },
+      "today_best_score": {
+        "name": "Best score today"
+      },
+      "tomorrow_best_score": {
+        "name": "Best score tomorrow"
+      },
+      "forecast_slots": {
+        "name": "Forecast slots"
+      }
+    }
+  }
+}

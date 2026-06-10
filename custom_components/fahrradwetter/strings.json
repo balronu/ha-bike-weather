@@ -1,0 +1,69 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Fahrradwetter",
+        "description": "Richte die Fahrradwetter-Bewertung mit OpenWeatherMap ein.",
+        "data": {
+          "name": "Name",
+          "api_key": "OpenWeatherMap API key",
+          "latitude": "Breitengrad",
+          "longitude": "Längengrad",
+          "language": "Sprache"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Die OpenWeatherMap-Vorhersage konnte nicht abgerufen werden."
+    },
+    "abort": {
+      "already_configured": "Dieser Standort ist bereits eingerichtet."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Fahrradwetter Optionen",
+        "data": {
+          "scan_interval": "Aktualisierung in Minuten",
+          "min_good_score": "Mindest-Score für gute Fahrradbedingungen",
+          "ideal_temp_min": "Ideale Mindesttemperatur",
+          "ideal_temp_max": "Ideale Höchsttemperatur",
+          "acceptable_temp_min": "Noch akzeptable Mindesttemperatur",
+          "acceptable_temp_max": "Noch akzeptable Höchsttemperatur",
+          "max_rain": "Maximaler Regen in mm pro 3 Stunden",
+          "max_pop": "Maximale Regenwahrscheinlichkeit in %",
+          "max_wind": "Maximaler Wind in m/s",
+          "max_gust": "Maximale Böen in m/s"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "recommendation": {
+        "name": "Empfehlung",
+        "state": {
+          "good": "Gut",
+          "ok": "Okay",
+          "bad": "Schlecht"
+        }
+      },
+      "score": {
+        "name": "Score"
+      },
+      "next_good_time": {
+        "name": "Nächstes gutes Zeitfenster"
+      },
+      "today_best_score": {
+        "name": "Bester Score heute"
+      },
+      "tomorrow_best_score": {
+        "name": "Bester Score morgen"
+      },
+      "forecast_slots": {
+        "name": "Vorhersageblöcke"
+      }
+    }
+  }
+}

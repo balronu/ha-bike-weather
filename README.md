@@ -4,7 +4,7 @@
 
 [Deutsch](README.md) · [README.de.md](README.de.md) · [English](README.en.md)
 
-> **Beta 3 – nicht als Stable-Version verwenden.** Diese Arbeitsfassung
+> **Beta 4 – nicht als Stable-Version verwenden.** Diese Arbeitsfassung
 > verbessert Config Flow, lokale Wetterstationssensoren, Lovelace-Karte,
 > Übersetzungen, Branding und Dokumentation. Installation und Praxistest über
 > HACS erfolgen ausschließlich durch den Nutzer.
@@ -22,7 +22,7 @@ Frischeprüfung priorisiert:
 
 Fehlende oder ungültige Werte werden nie stillschweigend als 0 behandelt.
 
-## Beta-3-Funktionen
+## Beta-4-Funktionen
 
 - native EntitySelectoren statt freier Entity-ID-Eingabe;
 - eindeutige Vorauswahl kompatibler lokaler Sensoren;
@@ -33,6 +33,8 @@ Fehlende oder ungültige Werte werden nie stillschweigend als 0 behandelt.
 - responsive custom:bike-weather-card mit Editor, Score, Messwerten,
   Datenquelle, Datenqualität, Fahrzeitfenster und Prognose;
 - neues Logo, README-Banner, Social Preview und konsistente Dokumentation.
+- reparierter Options Flow für Home Assistant 2026.10; bestehende Beta-2- und
+  Beta-3-Konfigurationen mit leeren Optionswerten bleiben erhalten.
 
 ## Voraussetzungen und Installation
 
@@ -40,7 +42,7 @@ Home Assistant 2026.10.x oder neuer und HACS werden vorausgesetzt.
 
 1. In HACS Benutzerdefinierte Repositories öffnen.
 2. balronu/ha-bike-weather als Repository-Typ Integration hinzufügen.
-3. Vorabversionen aktivieren und den Beta-3-Branch/Release auswählen.
+3. Vorabversionen aktivieren und den Beta-4-Release auswählen.
 4. Nach dem Download Home Assistant nach Aufforderung neu starten.
 5. Einstellungen → Geräte & Dienste → Integration hinzufügen → Bike Weather.
 
@@ -113,7 +115,7 @@ werden durch Tests abgesichert.
 
 Lokale Sensoren und Home-Assistant-Wetterdaten bleiben lokal. OpenWeatherMap
 wird nur bei ausdrücklicher Auswahl und mit eigenem API-Schlüssel kontaktiert.
-Beta 3 ist nicht als Stable freigegeben. Produktive HA-Installation,
+Beta 4 ist nicht als Stable freigegeben. Produktive HA-Installation,
 HACS-Update und Praxistest sind nicht Bestandteil dieses Branches.
 
 ## Entwicklung und Tests
@@ -138,7 +140,7 @@ diesem Branch nicht enthalten; die Browser-/HA-Laufzeitprüfung bleibt offen.
 - [Karte](docs/CARD.md)
 - [Installation](docs/INSTALLATION.md)
 - [Branding-Hinweise](BRANDING.md)
-- [Beta-3-Release Notes](docs/releases/v0.1.0-beta.3.md)
+- [Beta-4-Release Notes](docs/releases/v0.1.0-beta.4.md)
 
 ## Lizenz
 

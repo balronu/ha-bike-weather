@@ -1,9 +1,9 @@
-# Installation – v0.1.0-beta.3
+# Installation – v0.1.0-beta.4
 
 Diese Version ist eine HACS-Vorabversion. Aktiviere in HACS die Option für
 Vorabversionen und füge `balronu/ha-bike-weather` als benutzerdefiniertes
 Repository der Kategorie **Integration** hinzu. Installiere anschließend den
-Beta-3-Branch/Release und starte Home Assistant nach Aufforderung neu.
+Beta-4-Release und starte Home Assistant nach Aufforderung neu.
 
 Danach:
 

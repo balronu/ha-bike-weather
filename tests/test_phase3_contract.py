@@ -16,7 +16,7 @@ class Phase3ContractTests(unittest.TestCase):
         )
         self.assertEqual(manifest["domain"], "bike_weather")
         self.assertTrue(manifest["config_flow"])
-        self.assertEqual(manifest["version"], "0.1.0-beta.3")
+        self.assertEqual(manifest["version"], "0.1.0-beta.4")
         self.assertEqual(
             json.loads((ROOT / "hacs.json").read_text())["name"], "Bike Weather"
         )
@@ -37,7 +37,7 @@ class Phase3ContractTests(unittest.TestCase):
         self.assertIn("static getConfigElement", card)
         self.assertIn("static getStubConfig", card)
         self.assertIn("config-changed", card)
-        self.assertIn("0.1.0-beta.3", card)
+        self.assertIn("0.1.0-beta.4", card)
 
     def test_forecast_is_not_exposed_as_sensor_attribute_payload(self):
         sensor = (ROOT / "custom_components/bike_weather/sensor.py").read_text()

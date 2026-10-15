@@ -2,12 +2,11 @@
 
 # Bike Weather for Home Assistant
 
-[Deutsch](README.md) · [README.de.md](README.de.md) · [English](README.en.md)
+[🇩🇪 Deutsch](README.md) | 🇬🇧 **English**
 
-> **Beta 4 – not a stable release.** This branch improves the config flow,
-> local weather-station sensors, Lovelace card, translations, branding and
-> documentation. HACS installation and practical testing are performed only
-> by the user.
+> **Published: `v0.1.0-beta.3` – not a stable release.** The Beta 4 work
+> described below is not published yet. HACS installation and practical
+> testing are performed only by the user.
 
 ## Overview
 
@@ -21,7 +20,7 @@ Temperature, wind and rain are selected independently with freshness checks:
 
 Missing and invalid values are never silently treated as zero.
 
-## Beta 4 features
+## Unpublished Beta 4 work
 
 - native EntitySelectors instead of free-form entity IDs;
 - automatic selection only when exactly one compatible sensor is found;
@@ -41,7 +40,7 @@ Home Assistant 2026.10.x or newer and HACS are required.
 
 1. Open Custom repositories in HACS.
 2. Add balronu/ha-bike-weather as an Integration repository.
-3. Enable beta versions and select the Beta 4 release.
+3. Enable beta versions and select the published `v0.1.0-beta.3` release.
 4. Restart Home Assistant when requested after download.
 5. Add Bike Weather under Settings → Devices & services.
 
@@ -110,7 +109,7 @@ Hassfest, HACS validation and Gitleaks run through GitHub Actions.
 - [Card](docs/CARD.md)
 - [Installation](docs/INSTALLATION.md)
 - [Branding](BRANDING.md)
-- [Beta 4 release notes](docs/releases/v0.1.0-beta.4.md)
+- [Beta 4 release-notes draft](docs/releases/v0.1.0-beta.4.md)
 
 ## License
 

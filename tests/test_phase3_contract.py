@@ -23,6 +23,8 @@ class Phase3ContractTests(unittest.TestCase):
         self.assertIn('"bike-weather-card"', card)
         self.assertIn('"bike_weather/card_data"', card)
         self.assertIn("customElements.get", card)
+        self.assertIn("static getConfigElement", card)
+        self.assertIn("static getStubConfig", card)
         self.assertIn("config-changed", card)
         self.assertIn("0.1.0-beta.1", card)
 

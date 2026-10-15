@@ -41,8 +41,8 @@
       ${d && this.config.show_details ? `<div class="label" style="margin-top:12px">Source: ${escapeHtml((d.sources || []).join(", ") || "—")} · ${escapeHtml(d.quality || "—")}</div>` : ""}</ha-card>`;
     }
     getCardSize() { return 3; }
-    getConfigElement() { return document.createElement("bike-weather-card-editor"); }
-    getStubConfig() { return { entry_id: "", show_forecast: true, show_windows: true, show_details: true }; }
+    static getConfigElement() { return document.createElement("bike-weather-card-editor"); }
+    static getStubConfig() { return { entry_id: "", show_forecast: true, show_windows: true, show_details: true }; }
   }
   function value(v, unit) { return v == null ? "—" : `${Number(v).toFixed(1)} ${unit}`; }
   function formatTime(v) { if (!v) return "—"; const d = new Date(v); return Number.isNaN(d.valueOf()) ? "—" : d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }); }

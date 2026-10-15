@@ -1,4 +1,4 @@
-"""Static contracts for Beta 3 packaging and UI boundaries."""
+"""Static contracts for Beta 4 packaging and UI boundaries."""
 
 from __future__ import annotations
 
@@ -9,11 +9,11 @@ ROOT = Path(__file__).parents[1]
 INTEGRATION = ROOT / "custom_components" / "bike_weather"
 
 
-def test_beta3_version_is_consistent():
+def test_beta4_version_is_consistent():
     manifest = json.loads((INTEGRATION / "manifest.json").read_text())
-    assert manifest["version"] == "0.1.0-beta.3"
+    assert manifest["version"] == "0.1.0-beta.4"
     const = (INTEGRATION / "const.py").read_text()
-    assert 'CARD_VERSION = "0.1.0-beta.3"' in const
+    assert 'CARD_VERSION = "0.1.0-beta.4"' in const
 
 
 def test_runtime_core_is_bundled_and_no_external_runtime_import_remains():
@@ -61,7 +61,7 @@ def test_branding_dimensions_and_card_version():
     assert size(ROOT / "assets" / "branding" / "readme-banner.png") == (1280, 320)
     assert size(ROOT / "assets" / "branding" / "social-preview.png") == (1280, 640)
     card = (INTEGRATION / "www" / "bike-weather-card.js").read_text()
-    assert 'VERSION = "0.1.0-beta.3"' in card
+    assert 'VERSION = "0.1.0-beta.4"' in card
     assert "config-changed" in card
     assert "translatedStatus" in card
     assert "translatedQuality" in card

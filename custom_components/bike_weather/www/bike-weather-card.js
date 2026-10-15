@@ -1,7 +1,7 @@
-/* Bike Weather card v0.1.0-beta.5. */
+/* Bike Weather card v0.1.0-beta.6. */
 (function () {
   "use strict";
-  const VERSION = "0.1.0-beta.5";
+  const VERSION = "0.1.0-beta.6";
   const registered = window.customCards || (window.customCards = []);
   if (!registered.some((card) => card.type === "bike-weather-card")) {
     registered.push({ type: "bike-weather-card", name: "Bike Weather", description: "Cycling weather score and forecast" });

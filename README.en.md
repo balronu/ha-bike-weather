@@ -4,7 +4,7 @@
 
 [🇩🇪 Deutsch](README.md) | 🇬🇧 **English**
 
-> **Published: `v0.1.0-beta.5` – not a stable release.** HACS installation
+> **Published: `v0.1.0-beta.6` – not a stable release.** HACS installation
 > and practical testing are performed only by the user.
 
 ## Overview
@@ -19,7 +19,7 @@ Temperature, wind and rain are selected independently with freshness checks:
 
 Missing and invalid values are never silently treated as zero.
 
-## Beta 5 features
+## Beta 6 features
 
 - native EntitySelectors instead of free-form entity IDs;
 - automatic selection only when exactly one compatible sensor is found;
@@ -32,6 +32,8 @@ Missing and invalid values are never silently treated as zero.
 - new logo, README banner, social preview and synchronized documentation.
 - fully hardened Options Flow compatibility with Home Assistant 2026.10;
   existing Beta 2 through Beta 4 entries with empty options remain supported.
+- static Lovelace card routing through the current HA 2026.10 API with a legacy
+  fallback; the versioned resource remains automatically and idempotently registered.
 
 ## Requirements and installation
 
@@ -39,7 +41,7 @@ Home Assistant 2026.10.x or newer and HACS are required.
 
 1. Open Custom repositories in HACS.
 2. Add balronu/ha-bike-weather as an Integration repository.
-3. Enable beta versions and select the published `v0.1.0-beta.5` release.
+3. Enable beta versions and select the published `v0.1.0-beta.6` release.
 4. Restart Home Assistant when requested after download.
 5. Add Bike Weather under Settings → Devices & services.
 
@@ -108,7 +110,7 @@ Hassfest, HACS validation and Gitleaks run through GitHub Actions.
 - [Card](docs/CARD.md)
 - [Installation](docs/INSTALLATION.md)
 - [Branding](BRANDING.md)
-- [Beta 5 release notes](docs/releases/v0.1.0-beta.5.md)
+- [Beta 6 release notes](docs/releases/v0.1.0-beta.6.md)
 
 ## License
 

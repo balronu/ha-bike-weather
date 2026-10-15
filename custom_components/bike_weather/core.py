@@ -112,22 +112,42 @@ def _aware(value: datetime) -> datetime:
     return value.astimezone(UTC)
 
 
-def _wind(value: Any, unit: str | None) -> float | None:
+def normalize_temperature_c(value: Any, unit: str | None) -> float | None:
     number = _number(value)
     if number is None:
         return None
+    unit = str(unit or "").lower()
+    if unit in {"°f", "f"}:
+        return (number - 32) * 5 / 9
+    if unit in {"°c", "c", ""}:
+        return number
+    return None
+
+
+def normalize_wind_kmh(value: Any, unit: str | None) -> float | None:
+    number = _number(value)
+    if number is None:
+        return None
+    unit = str(unit or "").lower()
     if unit in {"m/s", "mps", "ms-1"}:
         return number * 3.6
     if unit == "mph":
         return number * 1.609344
-    return number
+    if unit in {"km/h", "kph", ""}:
+        return number
+    return None
 
 
-def _rain(value: Any, unit: str | None) -> float | None:
+def normalize_rain_rate_mmh(value: Any, unit: str | None) -> float | None:
     number = _number(value)
     if number is None:
         return None
-    return number * 25.4 if unit in {"in", "inch", "inches"} else number
+    unit = str(unit or "").lower()
+    if unit in {"in", "inch", "inches", "in/h", "inch/h"}:
+        return number * 25.4
+    if unit in {"mm", "mm/h", ""}:
+        return number
+    return None
 
 
 def from_ha_weather_state(source, state, *, retrieved_at, observed_at=None):
@@ -136,10 +156,10 @@ def from_ha_weather_state(source, state, *, retrieved_at, observed_at=None):
     observed_at = _aware(observed_at or retrieved_at)
     return WeatherObservation(
         source, observed_at, retrieved_at,
-        _number(attrs.get("temperature")),
+        normalize_temperature_c(attrs.get("temperature"), attrs.get("temperature_unit")),
         _number(attrs.get("apparent_temperature")),
-        _wind(attrs.get("wind_speed"), attrs.get("wind_speed_unit")),
-        precipitation_mm=_rain(attrs.get("precipitation"), attrs.get("precipitation_unit")),
+        normalize_wind_kmh(attrs.get("wind_speed"), attrs.get("wind_speed_unit")),
+        precipitation_mm=normalize_rain_rate_mmh(attrs.get("precipitation"), attrs.get("precipitation_unit")),
         precipitation_probability_pct=_number(attrs.get("precipitation_probability")),
         condition=state.get("state") or None,
         metadata={"entity_id": state["entity_id"]} if state.get("entity_id") else {},
@@ -157,9 +177,9 @@ def from_ha_forecast(source, forecast: Iterable[Mapping[str, Any]], *, retrieved
             source, starts[index], end, retrieved_at,
             _number(row.get("temperature")),
             _number(row.get("apparent_temperature")),
-            _wind(row.get("wind_speed"), row.get("wind_speed_unit")),
-            _wind(row.get("wind_gust"), row.get("wind_speed_unit")),
-            _rain(row.get("precipitation"), row.get("precipitation_unit")),
+            normalize_wind_kmh(row.get("wind_speed"), row.get("wind_speed_unit")),
+            normalize_wind_kmh(row.get("wind_gust"), row.get("wind_speed_unit")),
+            normalize_rain_rate_mmh(row.get("precipitation"), row.get("precipitation_unit")),
             precipitation_probability_pct=_number(row.get("precipitation_probability")),
             condition=row.get("condition") if isinstance(row.get("condition"), str) else None,
         ))
@@ -182,14 +202,14 @@ def _owm_observation(source, raw, retrieved):
     main, wind, rain = _mapping(raw.get("main")), _mapping(raw.get("wind")), _mapping(raw.get("rain"))
     weather = raw.get("weather") if isinstance(raw.get("weather"), list) else []
     observed = datetime.fromtimestamp(float(raw.get("dt", retrieved.timestamp())), UTC)
-    return WeatherObservation(source, observed, retrieved, _number(main.get("temp")), _number(main.get("feels_like")), _wind(wind.get("speed"), "m/s"), _wind(wind.get("gust"), "m/s"), _rain(rain.get("1h"), "mm"), condition=weather[0].get("description") if weather and isinstance(weather[0], Mapping) else None)
+    return WeatherObservation(source, observed, retrieved, _number(main.get("temp")), _number(main.get("feels_like")), normalize_wind_kmh(wind.get("speed"), "m/s"), normalize_wind_kmh(wind.get("gust"), "m/s"), normalize_rain_rate_mmh(rain.get("1h"), "mm"), condition=weather[0].get("description") if weather and isinstance(weather[0], Mapping) else None)
 
 
 def _owm_slot(source, raw, starts, ends, retrieved):
     main, wind, rain = _mapping(raw.get("main")), _mapping(raw.get("wind")), _mapping(raw.get("rain"))
     weather = raw.get("weather") if isinstance(raw.get("weather"), list) else []
     probability = _number(raw.get("pop"))
-    return ForecastSlot(source, starts, ends, retrieved, _number(main.get("temp")), _number(main.get("feels_like")), _wind(wind.get("speed"), "m/s"), _wind(wind.get("gust"), "m/s"), _rain(rain.get("3h"), "mm"), precipitation_probability_pct=probability * 100 if probability is not None else None, condition=weather[0].get("description") if weather and isinstance(weather[0], Mapping) else None)
+    return ForecastSlot(source, starts, ends, retrieved, _number(main.get("temp")), _number(main.get("feels_like")), normalize_wind_kmh(wind.get("speed"), "m/s"), normalize_wind_kmh(wind.get("gust"), "m/s"), normalize_rain_rate_mmh(rain.get("3h"), "mm"), precipitation_probability_pct=probability * 100 if probability is not None else None, condition=weather[0].get("description") if weather and isinstance(weather[0], Mapping) else None)
 
 
 def choose_metric_observations(observations, priorities, *, now, max_age):
@@ -254,4 +274,4 @@ def assess_score(observation, profile=None):
     return RideAssessment(status, score, quality, (observation.source.source_id,), reasons, scores, used)
 
 
-__all__ = ["DataQuality", "ForecastSlot", "RideAssessment", "RideProfile", "WeatherObservation", "WeatherSource", "assess_classic", "assess_score", "choose_metric_observations", "from_ha_forecast", "from_ha_weather_state", "from_openweather"]
+__all__ = ["DataQuality", "ForecastSlot", "RideAssessment", "RideProfile", "WeatherObservation", "WeatherSource", "assess_classic", "assess_score", "choose_metric_observations", "from_ha_forecast", "from_ha_weather_state", "from_openweather", "normalize_rain_rate_mmh", "normalize_temperature_c", "normalize_wind_kmh"]

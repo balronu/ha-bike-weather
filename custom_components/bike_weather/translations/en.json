@@ -1,1 +1,63 @@
-{"config":{"step":{"user":{"title":"Bike Weather","description":"Configure sources and the default profile.","data":{"name":"Name","provider":"Weather provider","weather_entity":"HA weather entity","api_key":"OpenWeatherMap API key","local_enabled":"Use local sensors","temperature_entity":"Temperature sensor","wind_entity":"Wind sensor","rain_entity":"Rain sensor","latitude":"Latitude","longitude":"Longitude"}}},"error":{"no_source":"Configure a weather provider or at least one local sensor.","api_key_required":"An OpenWeatherMap API key is required."}},"options":{"step":{"init":{"title":"Bike Weather options","data":{"provider":"Weather provider","weather_entity":"HA weather entity","api_key":"OpenWeatherMap API key","local_enabled":"Use local sensors","temperature_entity":"Temperature sensor","wind_entity":"Wind sensor","rain_entity":"Rain sensor","refresh_minutes":"Refresh interval","max_age_minutes":"Maximum data age","min_temperature_c":"Minimum temperature","max_wind_kmh":"Maximum wind","max_rain_mm":"Rain tolerance","min_score":"Minimum good score","ride_start":"Ride start","ride_duration_minutes":"Ride duration"}}}},"entity":{"sensor":{"assessment":{"name":"Assessment"},"score":{"name":"Score"},"temperature":{"name":"Temperature"},"wind":{"name":"Wind"},"rain":{"name":"Rain"},"data_quality":{"name":"Data quality"},"active_source":{"name":"Active source"},"last_success":{"name":"Last successful update"}}}}
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Bike Weather",
+        "description": "Choose a weather provider and optional local station sensors. Suggested entities are preselected only when detection is unambiguous.",
+        "data": {
+          "name": "Name",
+          "provider": "Weather provider",
+          "weather_entity": "Home Assistant weather entity",
+          "api_key": "OpenWeatherMap API key",
+          "local_enabled": "Use local weather-station sensors",
+          "temperature_entity": "Outdoor temperature sensor",
+          "wind_entity": "Wind-speed sensor",
+          "rain_entity": "Rain-rate sensor",
+          "latitude": "Latitude",
+          "longitude": "Longitude"
+        }
+      }
+    },
+    "error": {
+      "no_source": "Choose a weather provider or enable at least one local sensor.",
+      "api_key_required": "An OpenWeatherMap API key is required."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Bike Weather options",
+        "description": "All values are prefilled. Existing values are preserved when you save the form.",
+        "data": {
+          "provider": "Weather provider",
+          "weather_entity": "Home Assistant weather entity",
+          "api_key": "OpenWeatherMap API key",
+          "local_enabled": "Use local weather-station sensors",
+          "temperature_entity": "Outdoor temperature sensor",
+          "wind_entity": "Wind-speed sensor",
+          "rain_entity": "Rain-rate sensor",
+          "refresh_minutes": "Refresh interval (minutes)",
+          "max_age_minutes": "Maximum data age (minutes)",
+          "min_temperature_c": "Minimum temperature (°C)",
+          "max_wind_kmh": "Maximum wind (km/h)",
+          "max_rain_mm": "Rain tolerance (mm/h)",
+          "min_score": "Minimum good score",
+          "ride_start": "Ride-window start (HH:MM)",
+          "ride_duration_minutes": "Ride duration (minutes)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "assessment": {"name": "Assessment"},
+      "score": {"name": "Score"},
+      "temperature": {"name": "Temperature"},
+      "wind": {"name": "Wind"},
+      "rain": {"name": "Rain rate"},
+      "data_quality": {"name": "Data quality"},
+      "active_source": {"name": "Active source"},
+      "last_success": {"name": "Last successful update"}
+    }
+  }
+}

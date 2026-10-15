@@ -10,7 +10,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 
 from .api import async_setup_websocket
-from .const import CARD_URL, DOMAIN, PLATFORMS
+from .const import CARD_URL, CARD_VERSION, DOMAIN, PLATFORMS
 from .coordinator import BikeWeatherCoordinator
 
 _CARD_REGISTERED = "card_registered"
@@ -27,7 +27,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
             hass.http.register_static_path(
                 CARD_URL, str(www / "bike-weather-card.js"), cache_headers=True
             )
-        add_extra_js_url(hass, f"{CARD_URL}?v=0.1.0-beta.2")
+        add_extra_js_url(hass, f"{CARD_URL}?v={CARD_VERSION}")
         await async_setup_websocket(hass)
         hass.data.setdefault(DOMAIN, {})[_CARD_REGISTERED] = True
     return True

@@ -27,7 +27,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
             hass.http.register_static_path(
                 CARD_URL, str(www / "bike-weather-card.js"), cache_headers=True
             )
-        add_extra_js_url(hass, f"{CARD_URL}?v=0.1.0-beta.1")
+        add_extra_js_url(hass, f"{CARD_URL}?v=0.1.0-beta.2")
         await async_setup_websocket(hass)
         hass.data.setdefault(DOMAIN, {})[_CARD_REGISTERED] = True
     return True

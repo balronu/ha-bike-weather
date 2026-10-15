@@ -27,7 +27,7 @@ def _cutover(config: dict) -> dict:
     result["lovelace_cards"].append(
         {"card_id": "bike-weather", "type": "custom:bike-weather-card"}
     )
-    result["integration"] = {"domain": "bike_weather", "version": "0.1.0-beta.1"}
+    result["integration"] = {"domain": "bike_weather", "version": "0.1.0-beta.2"}
     return result
 
 

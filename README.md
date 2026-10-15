@@ -1,4 +1,4 @@
-# Bike Weather – v0.1.0-beta.1
+# Bike Weather – v0.1.0-beta.2
 
 Bike Weather (`bike_weather`) is a Home Assistant custom integration that
 combines configured Home Assistant weather/sensor entities or OpenWeatherMap
@@ -42,7 +42,7 @@ reviewable; it is not part of the migration procedure.
 
 ## Installation
 
-Install the `v0.1.0-beta.1` pre-release through HACS as a custom repository
+Install the `v0.1.0-beta.2` pre-release through HACS as a custom repository
 (`balronu/ha-bike-weather`, category **Integration**, pre-releases enabled).
 Restart Home Assistant, add **Bike Weather** through the integration UI, and
 then add the `bike-weather-card` Lovelace card with the resulting `entry_id`.
@@ -64,4 +64,4 @@ PYTHONPATH=. python -m pytest -q
 - [Configuration](docs/CONFIGURATION.md)
 - [Weather sources](docs/WEATHER_SOURCES.md)
 - [Phase 4D validation report](docs/PHASE4D-REPORT.md)
-- [Beta release notes](docs/releases/v0.1.0-beta.1.md)
+- [Beta release notes](docs/releases/v0.1.0-beta.2.md)

@@ -1,7 +1,7 @@
-/* Bike Weather card v0.1.0-beta.1. No scoring logic lives in this bundle. */
+/* Bike Weather card v0.1.0-beta.2. No scoring logic lives in this bundle. */
 (function () {
   "use strict";
-  const VERSION = "0.1.0-beta.1";
+  const VERSION = "0.1.0-beta.2";
   const registered = window.customCards || (window.customCards = []);
   if (!registered.some((card) => card.type === "bike-weather-card")) {
     registered.push({ type: "bike-weather-card", name: "Bike Weather", description: "Bike weather assessment" });

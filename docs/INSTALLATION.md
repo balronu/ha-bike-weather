@@ -1,4 +1,4 @@
-# Installation – v0.1.0-beta.6
+# Installation – v0.1.0-beta.7
 
 Diese Version ist eine HACS-Vorabversion. Aktiviere in HACS die Option für
 Vorabversionen und füge `balronu/ha-bike-weather` als benutzerdefiniertes
@@ -11,8 +11,8 @@ Danach:
 2. **Bike Weather** auswählen und eine Konfiguration anlegen.
 3. Eine Home-Assistant-Wetterentität, lokale Sensoren oder einen eigenen
    OpenWeatherMap-Schlüssel konfigurieren.
-4. Eine Lovelace-Karte vom Typ `custom:bike-weather-card` mit der erzeugten
-   `entry_id` anlegen.
+4. Eine Lovelace-Karte vom Typ `custom:bike-weather-card` anlegen. Bei genau
+   einer geladenen Integration wird die `entry_id` automatisch erkannt.
 
 Die Integration registriert `/bike_weather/bike-weather-card.js` automatisch
 über die aktuelle Home-Assistant-Static-Path-API.

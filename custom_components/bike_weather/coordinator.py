@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Mapping
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from aiohttp import ClientError
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
@@ -75,7 +77,11 @@ class BikeWeatherCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                     retrieved_at=now,
                 )
                 observations.append(normalized)
-                forecast = list(state.attributes.get("forecast", []))
+                try:
+                    forecast = await self._async_get_ha_forecast(entity_id)
+                except (HomeAssistantError, TypeError, ValueError) as err:
+                    LOGGER.debug("Home Assistant forecast update failed: %s", err)
+                    errors.append("ha_forecast_unavailable")
                 forecast_slots = list(
                     from_ha_forecast(source, forecast, retrieved_at=now)
                 )
@@ -139,6 +145,28 @@ class BikeWeatherCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             "errors": errors,
             "forecast_coverage": len(forecast),
         }
+
+    async def _async_get_ha_forecast(self, entity_id: str) -> list[dict[str, Any]]:
+        """Fetch forecast data through the current Home Assistant weather API."""
+        response = await self.hass.services.async_call(
+            "weather",
+            "get_forecasts",
+            {"entity_id": entity_id, "type": "hourly"},
+            blocking=True,
+            return_response=True,
+        )
+        if not isinstance(response, Mapping):
+            return []
+        payload = response.get("service_response", response)
+        if not isinstance(payload, Mapping):
+            return []
+        entity_response = payload.get(entity_id)
+        if not isinstance(entity_response, Mapping):
+            return []
+        forecast = entity_response.get("forecast", [])
+        if not isinstance(forecast, list):
+            return []
+        return [dict(item) for item in forecast if isinstance(item, Mapping)]
 
     def _local_observation(self, now: datetime) -> WeatherObservation | None:
         def value(entity_key: str, kind: str):

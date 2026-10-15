@@ -4,7 +4,7 @@
 
 [🇩🇪 Deutsch](README.md) | 🇬🇧 **English**
 
-> **Published: `v0.1.0-beta.6` – not a stable release.** HACS installation
+> **Published: `v0.1.0-beta.7` – not a stable release.** HACS installation
 > and practical testing are performed only by the user.
 
 ## Overview
@@ -19,7 +19,7 @@ Temperature, wind and rain are selected independently with freshness checks:
 
 Missing and invalid values are never silently treated as zero.
 
-## Beta 6 features
+## Beta 7 features
 
 - native EntitySelectors instead of free-form entity IDs;
 - automatic selection only when exactly one compatible sensor is found;
@@ -41,7 +41,7 @@ Home Assistant 2026.10.x or newer and HACS are required.
 
 1. Open Custom repositories in HACS.
 2. Add balronu/ha-bike-weather as an Integration repository.
-3. Enable beta versions and select the published `v0.1.0-beta.6` release.
+3. Enable beta versions and select the published `v0.1.0-beta.7` release.
 4. Restart Home Assistant when requested after download.
 5. Add Bike Weather under Settings → Devices & services.
 
@@ -69,7 +69,6 @@ ride-window and duration values when opened and saved.
 
 ~~~yaml
 type: custom:bike-weather-card
-entry_id: YOUR_CONFIG_ENTRY_ID
 show_forecast: true
 show_details: true
 ride_start: "07:30"
@@ -78,7 +77,7 @@ ride_duration_minutes: 60
 
 The card shows the score, assessment, temperature, wind, rain rate, forecast,
 ride window, duration, source and data quality. Missing or stale data is
-explicitly visible. The visual editor changes entry_id, forecast/details,
+explicitly visible. The integration is detected automatically; the visual editor changes entry_id, forecast/details,
 start time and duration.
 
 ## Score and limitations
@@ -110,7 +109,7 @@ Hassfest, HACS validation and Gitleaks run through GitHub Actions.
 - [Card](docs/CARD.md)
 - [Installation](docs/INSTALLATION.md)
 - [Branding](BRANDING.md)
-- [Beta 6 release notes](docs/releases/v0.1.0-beta.6.md)
+- [Beta 7 release notes](docs/releases/v0.1.0-beta.7.md)
 
 ## License
 

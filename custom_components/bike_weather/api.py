@@ -6,9 +6,10 @@ from typing import Any
 
 import voluptuous as vol
 from homeassistant.components import websocket_api
+from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import HomeAssistant
 
-from .const import DOMAIN, WS_CARD_DATA
+from .const import DOMAIN, WS_CARD_DATA, WS_LIST_ENTRIES
 
 _REGISTERED = "websocket_registered"
 
@@ -17,7 +18,28 @@ async def async_setup_websocket(hass: HomeAssistant) -> None:
     if hass.data.get(DOMAIN, {}).get(_REGISTERED):
         return
     websocket_api.async_register_command(hass, _card_data)
+    websocket_api.async_register_command(hass, _list_entries)
     hass.data.setdefault(DOMAIN, {})[_REGISTERED] = True
+
+
+@websocket_api.websocket_command({vol.Required("type"): WS_LIST_ENTRIES})
+@websocket_api.async_response
+async def _list_entries(
+    hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]
+) -> None:
+    """Return the non-secret, currently known Bike Weather entries."""
+    entries = []
+    for entry in hass.config_entries.async_entries(DOMAIN):
+        state = getattr(entry.state, "value", str(entry.state))
+        entries.append(
+            {
+                "entry_id": entry.entry_id,
+                "title": entry.title or "Bike Weather",
+                "state": state,
+                "available": entry.state is ConfigEntryState.LOADED,
+            }
+        )
+    connection.send_result(msg["id"], {"entries": entries})
 
 
 @websocket_api.websocket_command(

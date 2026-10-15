@@ -1,53 +1,67 @@
-# Bike Weather – Phase 2 offline prototype
+# Bike Weather – v0.1.0-beta.1
 
-This repository is a local development candidate for the planned Home
-Assistant custom integration **Bike Weather** (`bike_weather`). It currently
-contains a provider-neutral offline core and a legacy comparison adapter under
-`custom_components/fahrradwetter/`.
+Bike Weather (`bike_weather`) is a Home Assistant custom integration that
+combines configured Home Assistant weather/sensor entities or OpenWeatherMap
+data into ride-oriented sensors and a Lovelace card.
 
-## Phase 2 status
+**This is a beta release.** Offline and standalone browser checks pass, but this
+exact release has not received live Home Assistant runtime validation. Use it
+first in a disposable or otherwise recoverable Home Assistant instance.
 
-Implemented locally:
+The production VM 104 remains untouched. This release does not remove or
+automatically migrate the legacy YAML/REST bicycle-weather setup.
+
+## Included
 
 - normalized observations and forecast slots for HA weather entities and
   OpenWeatherMap payloads;
 - independent per-metric source prioritization with freshness checks;
-- strict classic `good`/`bad`/`unknown` assessment;
-- provisional explainable 0–100 score with conservative missing-data handling;
-- one-off and recurring ride windows, multi-interval aggregation and
-  gap-safe alternative starts;
-- offline unittest coverage without credentials or personal coordinates.
+- explainable 0–100 ride score with conservative missing-data handling;
+- Home Assistant config and options flows;
+- coordinator-backed sensors and authenticated card data;
+- automatic Lovelace card resource registration;
+- offline tests and standalone Chromium smoke coverage without credentials or
+  personal coordinates.
 
-The production VM 104 remains untouched. There is no installation, release,
-GitHub repository, push or HACS publication from this phase.
+The HA runtime, Hassfest and HACS limitations are recorded in
+[docs/PHASE4D-REPORT.md](docs/PHASE4D-REPORT.md).
 
 ## Layout
 
 ```text
 bike_weather_core/                 HA-independent domain core
-custom_components/fahrradwetter/   legacy local candidate for comparison only
-tests/test_core.py                  offline tests
-docs/PHASE2-*.md                    architecture, model, score and migration docs
+custom_components/bike_weather/    installable Bike Weather integration
+custom_components/fahrradwetter/   legacy local comparison candidate
+tests/                              offline tests
+docs/                               architecture, installation and release notes
 ```
 
-The future HA adapter will use domain `bike_weather`; it is intentionally not
-installed or wired in this phase. The legacy candidate remains under its old
-path so its behavior and migration risks stay visible and reviewable.
+The installable integration is `custom_components/bike_weather/`. The legacy
+candidate remains under its old path so migration risks stay visible and
+reviewable; it is not part of the migration procedure.
+
+## Installation
+
+Install the `v0.1.0-beta.1` pre-release through HACS as a custom repository
+(`balronu/ha-bike-weather`, category **Integration**, pre-releases enabled).
+Restart Home Assistant, add **Bike Weather** through the integration UI, and
+then add the `bike-weather-card` Lovelace card with the resulting `entry_id`.
+
+The integration registers its card resource automatically; do not remove
+existing unrelated Lovelace resources. See
+[docs/INSTALLATION.md](docs/INSTALLATION.md).
 
 ## Test
 
 ```bash
-PYTHONPATH=. python3 -m unittest discover -s tests -v
+PYTHONPATH=. python -m pytest -q
 ```
 
 ## Documentation
 
-- [Phase 2 architecture](docs/PHASE2-ARCHITECTURE.md)
-- [Phase 2 data model](docs/PHASE2-DATA-MODEL.md)
-- [Phase 2 score model](docs/PHASE2-SCORE-MODEL.md)
-- [Phase 2 migration](docs/PHASE2-MIGRATION.md)
-- [Phase 2 report](docs/PHASE2-REPORT.md)
-- [Live inventory](../docs/FAHRRADWETTER_BESTANDSAUFNAHME_2026-10-15.md)
-
-Score weights and partial-data policy are provisional and require explicit
-approval before production wiring.
+- [Installation](docs/INSTALLATION.md)
+- [Card](docs/CARD.md)
+- [Configuration](docs/CONFIGURATION.md)
+- [Weather sources](docs/WEATHER_SOURCES.md)
+- [Phase 4D validation report](docs/PHASE4D-REPORT.md)
+- [Beta release notes](docs/releases/v0.1.0-beta.1.md)

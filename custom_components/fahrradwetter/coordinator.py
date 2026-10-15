@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from datetime import timedelta
 import logging
+from datetime import timedelta
 from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
@@ -11,7 +11,12 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from .api import BikeWeatherThresholds, FahrradwetterApiError, FahrradwetterClient, build_bike_weather
+from .api import (
+    BikeWeatherThresholds,
+    FahrradwetterApiError,
+    FahrradwetterClient,
+    build_bike_weather,
+)
 from .const import (
     CONF_ACCEPTABLE_TEMP_MAX,
     CONF_ACCEPTABLE_TEMP_MIN,

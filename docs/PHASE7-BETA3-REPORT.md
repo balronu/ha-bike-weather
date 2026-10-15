@@ -79,7 +79,8 @@ the CI-equivalent invocation passed.
 ## GitHub gates
 
 The PR branch is prepared to run CI, Hassfest, HACS and Gitleaks through
-GitHub Actions. Results will be recorded here after the PR is opened.
+GitHub Actions. The PR is open at
+https://github.com/balronu/ha-bike-weather/pull/1. Results remain pending.
 
 ## Open limitations
 
@@ -92,8 +93,8 @@ GitHub Actions. Results will be recorded here after the PR is opened.
 ## Git
 
 - Branch: feature/v0.1.0-beta.3-ui-branding
-- Commit: to be filled after the final local commit
-- Pull request: to be filled after opening; merge intentionally not performed
+- Commit: 2959de1c58f48d294bafd1566c30f2fd0b3faaee
+- Pull request: https://github.com/balronu/ha-bike-weather/pull/1
 - Tag/release: none
 
 ## Recommendation

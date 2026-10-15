@@ -73,9 +73,13 @@ class BikeWeatherOptionsFlow(config_entries.OptionsFlow):
         values = {**self.config_entry.data, **self.config_entry.options}
         return self.async_show_form(
             step_id="init",
-            data_schema=_options_schema(values, self.config_entry.hass.config.language),
+            data_schema=_options_schema(
+                values,
+                self.hass.config.language,
+                suggestions=_suggestions(self.hass),
+            ),
             errors=errors,
-            description_placeholders=_suggestions(self.config_entry.hass),
+            description_placeholders=_suggestions(self.hass),
         )
 
 
@@ -154,7 +158,12 @@ def _user_schema(hass):
     )
 
 
-def _options_schema(values, language: str = "de"):
+def _options_schema(values, language: str = "de", suggestions=None):
+    suggestions = suggestions or {
+        "temperature_entity": "",
+        "wind_entity": "",
+        "rain_entity": "",
+    }
     return vol.Schema(
         {
             vol.Required(
@@ -168,13 +177,18 @@ def _options_schema(values, language: str = "de"):
                 CONF_LOCAL_ENABLED, default=values.get(CONF_LOCAL_ENABLED, False)
             ): bool,
             vol.Optional(
-                CONF_TEMPERATURE_ENTITY, default=values.get(CONF_TEMPERATURE_ENTITY, "")
+                CONF_TEMPERATURE_ENTITY,
+                default=values.get(
+                    CONF_TEMPERATURE_ENTITY, suggestions["temperature_entity"]
+                ),
             ): _entity("sensor", "temperature"),
             vol.Optional(
-                CONF_WIND_ENTITY, default=values.get(CONF_WIND_ENTITY, "")
+                CONF_WIND_ENTITY,
+                default=values.get(CONF_WIND_ENTITY, suggestions["wind_entity"]),
             ): _entity("sensor", "wind_speed"),
             vol.Optional(
-                CONF_RAIN_ENTITY, default=values.get(CONF_RAIN_ENTITY, "")
+                CONF_RAIN_ENTITY,
+                default=values.get(CONF_RAIN_ENTITY, suggestions["rain_entity"]),
             ): _entity("sensor"),
             vol.Required(
                 CONF_REFRESH_MINUTES,

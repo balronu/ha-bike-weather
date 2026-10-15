@@ -59,9 +59,9 @@ wenn alle verpflichtenden Prüfungen erfolgreich abgeschlossen sind.
 ## Veröffentlichung
 
 - PR: https://github.com/balronu/ha-bike-weather/pull/5;
-- Merge-Commit: wird nach dem Merge ergänzt;
+- Merge-Commit des Bugfix-PRs: `c52d3142afda0d00cf4b3db472dbbf7c711d92e0`;
 - Annotierter Tag: `v0.1.0-beta.5`;
-- Release: wird nach erfolgreicher Veröffentlichung ergänzt.
+- Release: https://github.com/balronu/ha-bike-weather/releases/tag/v0.1.0-beta.5
 
 ## Einschränkungen und Grenzen
 

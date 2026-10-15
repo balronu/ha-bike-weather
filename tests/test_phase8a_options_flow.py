@@ -24,6 +24,10 @@ def test_options_factory_uses_home_assistant_managed_entry_property():
     """HA now injects config_entry; custom assignment raises AttributeError."""
     source = FLOW.read_text(encoding="utf-8")
     assert "return BikeWeatherOptionsFlow()" in source
+    assert "self.config_entry.hass" not in source
+    assert "self.hass.config.language" in source
+    assert "suggestions=_suggestions(self.hass)" in source
+    assert "_suggestions(self.hass)" in source
 
     options_flow = _classes()["BikeWeatherOptionsFlow"]
     assert not any(

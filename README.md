@@ -1,140 +1,53 @@
-# Fahrradwetter
+# Bike Weather – Phase 2 offline prototype
 
-Fahrradwetter is a custom Home Assistant integration that rates upcoming bike
-weather from the OpenWeatherMap 5 day / 3 hour forecast. It replaces hard-coded
-template sensors with a reusable UI-configured integration.
+This repository is a local development candidate for the planned Home
+Assistant custom integration **Bike Weather** (`bike_weather`). It currently
+contains a provider-neutral offline core and a legacy comparison adapter under
+`custom_components/fahrradwetter/`.
 
-## Features
+## Phase 2 status
 
-- Uses OpenWeatherMap forecast data for any configured latitude/longitude
-- Configurable thresholds for temperature, rain, rain probability, wind and gusts
-- Provides a compact recommendation, numeric score and best riding windows
-- Can be installed through HACS as a custom repository
+Implemented locally:
 
-## Sensors
+- normalized observations and forecast slots for HA weather entities and
+  OpenWeatherMap payloads;
+- independent per-metric source prioritization with freshness checks;
+- strict classic `good`/`bad`/`unknown` assessment;
+- provisional explainable 0–100 score with conservative missing-data handling;
+- one-off and recurring ride windows, multi-interval aggregation and
+  gap-safe alternative starts;
+- offline unittest coverage without credentials or personal coordinates.
 
-After setup, Home Assistant creates these sensors for the configured location:
+The production VM 104 remains untouched. There is no installation, release,
+GitHub repository, push or HACS publication from this phase.
 
-- `sensor.<name>_empfehlung`: `good`, `ok` or `bad`
-- `sensor.<name>_score`: current 3-hour block score from 0 to 100
-- `sensor.<name>_nachstes_gutes_zeitfenster`: timestamp of the next good slot
-- `sensor.<name>_bester_score_heute`: best daytime score today
-- `sensor.<name>_bester_score_morgen`: best daytime score tomorrow
-- `sensor.<name>_vorhersageblocke`: number of raw forecast blocks, with the next
-  blocks in attributes
-
-The recommendation sensor includes useful attributes such as `reason`,
-`next_good_slot`, `today_best_slot` and `tomorrow_best_slot`.
-
-## Installation with HACS
-
-1. Open Home Assistant.
-2. Go to **HACS**.
-3. Open the three-dot menu in the top-right corner.
-4. Select **Custom repositories**.
-5. Add the GitHub repository URL.
-6. Select **Integration** as the repository type.
-7. Click **Add**.
-8. Search for **Fahrradwetter** in HACS and install it.
-9. Restart Home Assistant.
-
-HACS custom repository handling is documented by HACS itself: add the repository
-URL, select the correct type and click **ADD**. See the HACS custom repository
-docs: https://www.hacs.xyz/docs/faq/custom_repositories/
-
-## Setup
-
-1. In Home Assistant, go to **Settings** -> **Devices & services**.
-2. Click **Add integration**.
-3. Search for **Fahrradwetter**.
-4. Enter:
-   - OpenWeatherMap API key
-   - latitude
-   - longitude
-   - language, for example `de`
-5. Save.
-
-You can change scoring thresholds later from the integration's **Configure**
-button.
-
-## OpenWeatherMap API key
-
-Create a free API key at OpenWeatherMap and enable access to the 5 day / 3 hour
-forecast API. The integration calls:
+## Layout
 
 ```text
-https://api.openweathermap.org/data/2.5/forecast
+bike_weather_core/                 HA-independent domain core
+custom_components/fahrradwetter/   legacy local candidate for comparison only
+tests/test_core.py                  offline tests
+docs/PHASE2-*.md                    architecture, model, score and migration docs
 ```
 
-The integration uses metric units.
+The future HA adapter will use domain `bike_weather`; it is intentionally not
+installed or wired in this phase. The legacy candidate remains under its old
+path so its behavior and migration risks stay visible and reviewable.
 
-## Example dashboard card
+## Test
 
-```yaml
-type: markdown
-content: |
-  {% set rec = states('sensor.fahrradwetter_empfehlung') %}
-  {% set score = states('sensor.fahrradwetter_score') %}
-  {% set next = states('sensor.fahrradwetter_nachstes_gutes_zeitfenster') %}
-  {% set reason = state_attr('sensor.fahrradwetter_empfehlung', 'reason') %}
-
-  ## Fahrradwetter
-
-  Empfehlung: **{{ rec }}**
-  Score: **{{ score }} %**
-  Grund: {{ reason }}
-
-  {% if next not in ['unknown', 'unavailable', 'none', ''] %}
-  Nächstes gutes Zeitfenster: **{{ as_datetime(next).strftime('%d.%m. %H:%M') }}**
-  {% else %}
-  Kein gutes Zeitfenster in der aktuellen Vorhersage.
-  {% endif %}
+```bash
+PYTHONPATH=. python3 -m unittest discover -s tests -v
 ```
 
-## Automations
+## Documentation
 
-Example: notify when a good bike window appears.
+- [Phase 2 architecture](docs/PHASE2-ARCHITECTURE.md)
+- [Phase 2 data model](docs/PHASE2-DATA-MODEL.md)
+- [Phase 2 score model](docs/PHASE2-SCORE-MODEL.md)
+- [Phase 2 migration](docs/PHASE2-MIGRATION.md)
+- [Phase 2 report](docs/PHASE2-REPORT.md)
+- [Live inventory](../docs/FAHRRADWETTER_BESTANDSAUFNAHME_2026-10-15.md)
 
-```yaml
-alias: Fahrradwetter - gute Bedingungen
-trigger:
-  - platform: numeric_state
-    entity_id: sensor.fahrradwetter_score
-    above: 70
-condition: []
-action:
-  - service: notify.mobile_app_your_phone
-    data:
-      title: Fahrradwetter
-      message: >
-        Gute Bedingungen: {{ states('sensor.fahrradwetter_score') }} %.
-        {{ state_attr('sensor.fahrradwetter_empfehlung', 'reason') }}
-mode: single
-```
-
-## Development
-
-Repository layout:
-
-```text
-custom_components/fahrradwetter/
-  __init__.py
-  api.py
-  config_flow.py
-  const.py
-  coordinator.py
-  manifest.json
-  sensor.py
-  strings.json
-  translations/
-hacs.json
-```
-
-For HACS publication, this repository includes HACS and Hassfest GitHub Actions.
-HACS requires a `hacs.json` in the repository root, and HACS integration
-repositories need a Home Assistant `manifest.json` with the usual metadata.
-See:
-
-- https://www.hacs.xyz/docs/publish/start/
-- https://www.hacs.xyz/docs/publish/integration/
-- https://developers.home-assistant.io/docs/creating_integration_manifest/
+Score weights and partial-data policy are provisional and require explicit
+approval before production wiring.

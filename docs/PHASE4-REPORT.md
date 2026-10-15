@@ -36,11 +36,26 @@ nicht.
 Die HA-Installationsversuche liefen ausschließlich in `.venv-phase4`; es
 wurde kein Systempaket und keine produktive Umgebung verändert.
 
+## Bootstrap-/Prozessprüfung
+
+Die abschließende Lesekontrolle am 2026-10-15 ergab keinen laufenden
+Python-, pip-, curl-, Bootstrap-, `ensurepip`- oder uv-Prozess. Es war daher
+kein Prozess zu beenden; OpenClaw-, Gateway- und Systemprozesse wurden nicht
+angerührt. Für die zuvor beendeten Installationsversuche liegt kein
+persistentes Prozesslog vor. Der letzte bekannte Fehler ist im Abschnitt
+„Isolierte Testumgebung“ dokumentiert: der Home-Assistant-Resolver blieb bei
+Bluetooth-Abhängigkeiten hängen und wurde kontrolliert abgebrochen. Es wurde
+danach kein weiterer Versuch über diesen Installationsweg gestartet.
+
+Die lokale `.venv-phase4` ist für Offline-Prüfungen verwendbar und enthält
+Python 3.13.5, pip 26.2.1, pytest, Ruff und mypy. `uv` ist nicht installiert;
+eine vollständige HA-Testumgebung steht weiterhin nicht zur Verfügung.
+
 ## Tatsächlich ausgeführte Tests
 
 | Prüfung | Ergebnis | Details |
 |---|---|---|
-| Python pytest | PASS | 19 Tests, einschließlich Phase-4-Cutover-Simulation |
+| Python pytest | PASS | `PYTHONPATH=. .venv-phase4/bin/pytest -q`: 19 Tests, einschließlich Phase-4-Cutover-Simulation; ohne den lokalen Importpfad ist das Quellworkspace nicht installiert und die Collection schlägt erwartungsgemäß fehl |
 | Python unittest | PASS | 17 bestehende Phase-2/3-Tests |
 | Ruff | PASS | Core, neue Integration und Tests |
 | mypy | PASS | Core mit `--ignore-missing-imports` |

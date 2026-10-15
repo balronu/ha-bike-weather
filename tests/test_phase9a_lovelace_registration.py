@@ -26,3 +26,20 @@ def test_card_bundle_contract_remains_idempotent_and_versioned():
     assert 'customElements.get("bike-weather-card-editor")' in source
     assert 'window.BIKE_WEATHER_CARD_VERSION = VERSION' in source
     assert 'const VERSION = "0.1.0-beta.6"' in source
+
+
+def test_card_editor_initializes_before_hass_or_set_config():
+    source = CARD.read_text()
+
+    assert "constructor() { super(); this.config =" in source
+    assert "...(config || {})" in source
+    assert "if (!this.config) return;" in source
+
+
+def test_ha_weather_uses_response_forecast_service_not_state_attribute():
+    source = (ROOT / "custom_components" / "bike_weather" / "coordinator.py").read_text()
+
+    assert '"get_forecasts"' in source
+    assert '"type": "hourly"' in source
+    assert "return_response=True" in source
+    assert 'state.attributes.get("forecast", [])' not in source

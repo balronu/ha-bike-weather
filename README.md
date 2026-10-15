@@ -4,7 +4,7 @@
 
 🇩🇪 **Deutsch** | [🇬🇧 English](README.en.md)
 
-> **Veröffentlicht: `v0.1.0-beta.5` – nicht als Stable-Version verwenden.**
+> **Veröffentlicht: `v0.1.0-beta.6` – nicht als Stable-Version verwenden.**
 > Installation und Praxistest über HACS erfolgen ausschließlich durch den Nutzer.
 
 ## Überblick
@@ -20,7 +20,7 @@ Frischeprüfung priorisiert:
 
 Fehlende oder ungültige Werte werden nie stillschweigend als 0 behandelt.
 
-## Beta-5-Funktionen
+## Beta-6-Funktionen
 
 - native EntitySelectoren statt freier Entity-ID-Eingabe;
 - eindeutige Vorauswahl kompatibler lokaler Sensoren;
@@ -33,6 +33,8 @@ Fehlende oder ungültige Werte werden nie stillschweigend als 0 behandelt.
 - neues Logo, README-Banner, Social Preview und konsistente Dokumentation.
 - vollständig abgesicherter Options Flow für Home Assistant 2026.10; bestehende
   Beta-2- bis Beta-4-Konfigurationen mit leeren Optionswerten bleiben erhalten.
+- statische Lovelace-Kartenroute über die aktuelle HA-2026.10-API mit Legacy-Fallback;
+  die versionierte Ressource wird weiterhin automatisch und idempotent registriert.
 
 ## Voraussetzungen und Installation
 
@@ -40,7 +42,7 @@ Home Assistant 2026.10.x oder neuer und HACS werden vorausgesetzt.
 
 1. In HACS Benutzerdefinierte Repositories öffnen.
 2. balronu/ha-bike-weather als Repository-Typ Integration hinzufügen.
-3. Vorabversionen aktivieren und den veröffentlichten Release `v0.1.0-beta.5` auswählen.
+3. Vorabversionen aktivieren und den veröffentlichten Release `v0.1.0-beta.6` auswählen.
 4. Nach dem Download Home Assistant nach Aufforderung neu starten.
 5. Einstellungen → Geräte & Dienste → Integration hinzufügen → Bike Weather.
 
@@ -113,7 +115,7 @@ werden durch Tests abgesichert.
 
 Lokale Sensoren und Home-Assistant-Wetterdaten bleiben lokal. OpenWeatherMap
 wird nur bei ausdrücklicher Auswahl und mit eigenem API-Schlüssel kontaktiert.
-Beta 5 ist nicht als Stable freigegeben. Produktive HA-Installation,
+Beta 6 ist nicht als Stable freigegeben. Produktive HA-Installation,
 HACS-Update und Praxistest sind nicht Bestandteil dieses Branches.
 
 ## Entwicklung und Tests
@@ -138,7 +140,7 @@ diesem Branch nicht enthalten; die Browser-/HA-Laufzeitprüfung bleibt offen.
 - [Karte](docs/CARD.md)
 - [Installation](docs/INSTALLATION.md)
 - [Branding-Hinweise](BRANDING.md)
-- [Beta-5-Release Notes](docs/releases/v0.1.0-beta.5.md)
+- [Beta-6-Release Notes](docs/releases/v0.1.0-beta.6.md)
 
 ## Lizenz
 

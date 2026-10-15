@@ -1,9 +1,9 @@
-# Installation – v0.1.0-beta.5
+# Installation – v0.1.0-beta.6
 
 Diese Version ist eine HACS-Vorabversion. Aktiviere in HACS die Option für
 Vorabversionen und füge `balronu/ha-bike-weather` als benutzerdefiniertes
 Repository der Kategorie **Integration** hinzu. Installiere anschließend den
-Beta-5-Release und starte Home Assistant nach Aufforderung neu.
+Beta-6-Release und starte Home Assistant nach Aufforderung neu.
 
 Danach:
 
@@ -14,7 +14,8 @@ Danach:
 4. Eine Lovelace-Karte vom Typ `custom:bike-weather-card` mit der erzeugten
    `entry_id` anlegen.
 
-Die Integration registriert `/bike_weather/bike-weather-card.js` automatisch.
+Die Integration registriert `/bike_weather/bike-weather-card.js` automatisch
+über die aktuelle Home-Assistant-Static-Path-API.
 Eine manuelle Ressourcenregistrierung ist nicht erforderlich. Bestehende,
 andere Lovelace-Ressourcen bleiben unverändert.
 

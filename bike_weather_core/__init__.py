@@ -19,6 +19,9 @@ from .normalize import (
     from_ha_forecast,
     from_ha_weather_state,
     from_openweather,
+    normalize_rain_rate_mmh,
+    normalize_temperature_c,
+    normalize_wind_kmh,
 )
 from .scoring import assess_classic, assess_score
 from .windows import assess_window, find_alternative_starts
@@ -39,4 +42,7 @@ __all__ = [
     "from_ha_forecast",
     "from_ha_weather_state",
     "from_openweather",
+    "normalize_rain_rate_mmh",
+    "normalize_temperature_c",
+    "normalize_wind_kmh",
 ]

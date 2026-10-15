@@ -14,6 +14,7 @@ CONF_LOCAL_ENABLED = "local_enabled"
 CONF_TEMPERATURE_ENTITY = "temperature_entity"
 CONF_WIND_ENTITY = "wind_entity"
 CONF_RAIN_ENTITY = "rain_entity"
+CONF_RAIN_RATE_ENTITY = CONF_RAIN_ENTITY
 CONF_PROFILE = "profile"
 CONF_OPTIONS = "options"
 CONF_MAX_AGE_MINUTES = "max_age_minutes"
@@ -42,3 +43,4 @@ DEFAULT_PROFILE = "standard"
 DEFAULT_UPDATE_INTERVAL = timedelta(minutes=DEFAULT_REFRESH_MINUTES)
 CARD_URL = "/bike_weather/bike-weather-card.js"
 WS_CARD_DATA = "bike_weather/card_data"
+CARD_VERSION = "0.1.0-beta.3"

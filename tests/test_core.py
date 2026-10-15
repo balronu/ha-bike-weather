@@ -21,6 +21,9 @@ from bike_weather_core import (
     from_ha_forecast,
     from_ha_weather_state,
     from_openweather,
+    normalize_rain_rate_mmh,
+    normalize_temperature_c,
+    normalize_wind_kmh,
 )
 
 NOW = datetime(2026, 1, 15, 12, tzinfo=UTC)
@@ -63,6 +66,15 @@ def slot(start: datetime, source=ONLINE, **kwargs):
 
 
 class NormalizationTests(unittest.TestCase):
+    def test_local_units_are_normalized_and_unknown_units_are_missing(self):
+        self.assertAlmostEqual(normalize_temperature_c(68, "°F"), 20)
+        self.assertAlmostEqual(normalize_wind_kmh(10, "m/s"), 36)
+        self.assertAlmostEqual(normalize_wind_kmh(10, "mph"), 16.09344)
+        self.assertAlmostEqual(normalize_rain_rate_mmh(1, "in/h"), 25.4)
+        self.assertIsNone(normalize_temperature_c(20, "K"))
+        self.assertIsNone(normalize_wind_kmh(10, "knots"))
+        self.assertIsNone(normalize_rain_rate_mmh(1, "l/m²"))
+
     def test_ha_weather_units_are_normalized_without_filling_missing_rain(self):
         result = from_ha_weather_state(
             ONLINE,

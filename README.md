@@ -1,67 +1,145 @@
-# Bike Weather – v0.1.0-beta.2
+![Bike Weather](assets/branding/readme-banner.png)
 
-Bike Weather (`bike_weather`) is a Home Assistant custom integration that
-combines configured Home Assistant weather/sensor entities or OpenWeatherMap
-data into ride-oriented sensors and a Lovelace card.
+# Bike Weather – Fahrradwetter für Home Assistant
 
-**This is a beta release.** Offline and standalone browser checks pass, but this
-exact release has not received live Home Assistant runtime validation. Use it
-first in a disposable or otherwise recoverable Home Assistant instance.
+[Deutsch](README.md) · [README.de.md](README.de.md) · [English](README.en.md)
 
-The production VM 104 remains untouched. This release does not remove or
-automatically migrate the legacy YAML/REST bicycle-weather setup.
+> **Beta 3 – nicht als Stable-Version verwenden.** Diese Arbeitsfassung
+> verbessert Config Flow, lokale Wetterstationssensoren, Lovelace-Karte,
+> Übersetzungen, Branding und Dokumentation. Installation und Praxistest über
+> HACS erfolgen ausschließlich durch den Nutzer.
 
-## Included
+## Überblick
 
-- normalized observations and forecast slots for HA weather entities and
-  OpenWeatherMap payloads;
-- independent per-metric source prioritization with freshness checks;
-- explainable 0–100 ride score with conservative missing-data handling;
-- Home Assistant config and options flows;
-- coordinator-backed sensors and authenticated card data;
-- automatic Lovelace card resource registration;
-- offline tests and standalone Chromium smoke coverage without credentials or
-  personal coordinates.
+Bike Weather erzeugt aus einer Home-Assistant-Wetterentität, OpenWeatherMap
+und/oder einer lokalen Wetterstation einen nachvollziehbaren Fahrradwetter-
+Score von 0 bis 100. Temperatur, Wind und Regen werden pro Messgröße mit
+Frischeprüfung priorisiert:
 
-The HA runtime, Hassfest and HACS limitations are recorded in
-[docs/PHASE4D-REPORT.md](docs/PHASE4D-REPORT.md).
+1. lokaler Wetterstationssensor, wenn aktiviert und gültig;
+2. konfigurierter Wetteranbieter;
+3. unbekannt, wenn keine belastbaren Daten vorliegen.
 
-## Layout
+Fehlende oder ungültige Werte werden nie stillschweigend als 0 behandelt.
 
-```text
-bike_weather_core/                 HA-independent domain core
-custom_components/bike_weather/    installable Bike Weather integration
-custom_components/fahrradwetter/   legacy local comparison candidate
-tests/                              offline tests
-docs/                               architecture, installation and release notes
-```
+## Beta-3-Funktionen
 
-The installable integration is `custom_components/bike_weather/`. The legacy
-candidate remains under its old path so migration risks stay visible and
-reviewable; it is not part of the migration procedure.
+- native EntitySelectoren statt freier Entity-ID-Eingabe;
+- eindeutige Vorauswahl kompatibler lokaler Sensoren;
+- unabhängige Sensoren für Außentemperatur, Windgeschwindigkeit und Regenrate;
+- Einheiten: °C/°F, km/h/m/s/mph sowie mm/h und in/h;
+- Provider-Auswahl mit verständlichen deutschen und englischen Beschriftungen;
+- Options Flow mit vorausgefüllten und verlustfrei gespeicherten Einstellungen;
+- responsive custom:bike-weather-card mit Editor, Score, Messwerten,
+  Datenquelle, Datenqualität, Fahrzeitfenster und Prognose;
+- neues Logo, README-Banner, Social Preview und konsistente Dokumentation.
 
-## Installation
+## Voraussetzungen und Installation
 
-Install the `v0.1.0-beta.2` pre-release through HACS as a custom repository
-(`balronu/ha-bike-weather`, category **Integration**, pre-releases enabled).
-Restart Home Assistant, add **Bike Weather** through the integration UI, and
-then add the `bike-weather-card` Lovelace card with the resulting `entry_id`.
+Home Assistant 2026.10.x oder neuer und HACS werden vorausgesetzt.
 
-The integration registers its card resource automatically; do not remove
-existing unrelated Lovelace resources. See
-[docs/INSTALLATION.md](docs/INSTALLATION.md).
+1. In HACS Benutzerdefinierte Repositories öffnen.
+2. balronu/ha-bike-weather als Repository-Typ Integration hinzufügen.
+3. Vorabversionen aktivieren und den Beta-3-Branch/Release auswählen.
+4. Nach dem Download Home Assistant nach Aufforderung neu starten.
+5. Einstellungen → Geräte & Dienste → Integration hinzufügen → Bike Weather.
 
-## Test
+Eine manuelle Lovelace-Ressource ist nicht erforderlich. Die Karte wird
+idempotent als versionierte Ressource registriert. Unabhängige vorhandene
+Lovelace-Ressourcen werden nicht verändert.
 
-```bash
-PYTHONPATH=. python -m pytest -q
-```
+## Einrichtung
 
-## Documentation
+### Wetteranbieter
 
+Der Provider kann sein:
+
+- Home-Assistant-Wetterintegration: eine passende weather.*-Entität wird
+  über EntitySelector gewählt;
+- OpenWeatherMap: API-Schlüssel wird nur für diesen Provider benötigt;
+- Kein zusätzlicher Wetteranbieter: nur lokale Sensoren.
+
+Beispiele wie weather.openweathermap oder weather.forecast_home sind nicht
+fest codiert.
+
+### Lokale Wetterstation
+
+Aktiviere Lokale Wetterstationssensoren verwenden und wähle unabhängig:
+
+- Außentemperatur;
+- Windgeschwindigkeit;
+- Regenrate.
+
+Bei einer GW1100A können beispielsweise
+sensor.gw1100a_v2_2_3_outdoor_temperature,
+sensor.gw1100a_v2_2_3_wind_speed und
+sensor.gw1100a_v2_2_3_rain_rate verwendet werden. Diese IDs sind nur
+Beispiele. Andere kompatible Wetterstationen werden über Geräteeigenschaften
+und Einheiten unterstützt. Bei mehreren Kandidaten bleibt die Auswahl leer,
+damit keine falsche Entität automatisch gewählt wird.
+
+### Optionen nachträglich ändern
+
+Der Options Flow erhält bestehende Werte und erlaubt Provider, Entitäten,
+Datenalter, Aktualisierung, Score-Grenze, Fahrzeitfenster und Fahrtdauer zu
+ändern. Nicht bearbeitete Beta-2-Einstellungen bleiben erhalten.
+
+## Lovelace-Karte
+
+~~~yaml
+type: custom:bike-weather-card
+entry_id: DEINE_CONFIG_ENTRY_ID
+show_forecast: true
+show_details: true
+ride_start: "07:30"
+ride_duration_minutes: 60
+~~~
+
+Die Karte zeigt Score, Bewertung, Temperatur, Wind, Regenrate, Prognose,
+Fahrzeitfenster, Fahrtdauer, Datenquelle und Datenqualität. Fehlende oder
+veraltete Daten werden ausdrücklich angezeigt. Der visuelle Karteneditor
+kann entry_id, Prognose/Details, Startzeit und Fahrtdauer ändern.
+
+## Bewertung
+
+Der Score ist ein konservativer gewichteter Wert zwischen 0 und 100. Er
+berücksichtigt Temperatur, Wind, Böen, Regen, Regenwahrscheinlichkeit und
+gefühlte Temperatur. Fehlende Faktoren reduzieren die Datenqualität; ein
+unvollständiger Datensatz wird nicht als uneingeschränkt gute Fahrt
+ausgegeben. Die tatsächlichen Standardwerte stehen im gebündelten Core und
+werden durch Tests abgesichert.
+
+## Datenschutz und Einschränkungen
+
+Lokale Sensoren und Home-Assistant-Wetterdaten bleiben lokal. OpenWeatherMap
+wird nur bei ausdrücklicher Auswahl und mit eigenem API-Schlüssel kontaktiert.
+Beta 3 ist nicht als Stable freigegeben. Produktive HA-Installation,
+HACS-Update und Praxistest sind nicht Bestandteil dieses Branches.
+
+## Entwicklung und Tests
+
+~~~bash
+PYTHONPATH=. python3 -m pytest -q
+python3 -m unittest discover -s tests -p 'test_*.py'
+ruff check .
+mypy bike_weather_core
+python3 -m compileall -q bike_weather_core custom_components/bike_weather tests
+node --check custom_components/bike_weather/www/bike-weather-card.js
+~~~
+
+Hassfest, HACS-Validierung und Gitleaks laufen zusätzlich über GitHub Actions.
+Echte Screenshots aus einer produktiven Home-Assistant-Installation sind in
+diesem Branch nicht enthalten; die Browser-/HA-Laufzeitprüfung bleibt offen.
+
+## Dateien und Branding
+
+- [Englische README](README.en.md)
+- [Konfiguration](docs/CONFIGURATION.md)
+- [Karte](docs/CARD.md)
 - [Installation](docs/INSTALLATION.md)
-- [Card](docs/CARD.md)
-- [Configuration](docs/CONFIGURATION.md)
-- [Weather sources](docs/WEATHER_SOURCES.md)
-- [Phase 4D validation report](docs/PHASE4D-REPORT.md)
-- [Beta release notes](docs/releases/v0.1.0-beta.2.md)
+- [Branding-Hinweise](BRANDING.md)
+- [Beta-3-Release Notes](docs/releases/v0.1.0-beta.3.md)
+
+## Lizenz
+
+MIT, siehe [LICENSE](LICENSE).

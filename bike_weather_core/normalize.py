@@ -30,24 +30,48 @@ def _aware(value: datetime) -> datetime:
     return value.astimezone(UTC)
 
 
+def normalize_temperature_c(value: Any, unit: str | None) -> float | None:
+    number = _number(value)
+    if number is None:
+        return None
+    unit = str(unit or "").lower()
+    if unit in {"°f", "f"}:
+        return (number - 32) * 5 / 9
+    if unit in {"°c", "c", ""}:
+        return number
+    return None
+
+
 def _wind_kmh(value: Any, unit: str | None) -> float | None:
     number = _number(value)
     if number is None:
         return None
+    unit = str(unit or "").lower()
     if unit in {"m/s", "mps", "ms-1"}:
         return number * 3.6
     if unit in {"mph"}:
         return number * 1.609344
-    return number
+    if unit in {"km/h", "kph", ""}:
+        return number
+    return None
+
+
+def normalize_wind_kmh(value: Any, unit: str | None) -> float | None:
+    return _wind_kmh(value, unit)
 
 
 def _rain_mm(value: Any, unit: str | None) -> float | None:
     number = _number(value)
     if number is None:
         return None
-    if unit in {"in", "inch", "inches"}:
+    unit = str(unit or "").lower()
+    if unit in {"in", "inch", "inches", "in/h", "inch/h"}:
         return number * 25.4
-    return number
+    return number if unit in {"mm", "mm/h", ""} else None
+
+
+def normalize_rain_rate_mmh(value: Any, unit: str | None) -> float | None:
+    return _rain_mm(value, unit)
 
 
 def from_ha_weather_state(
@@ -67,7 +91,7 @@ def from_ha_weather_state(
         source=source,
         observed_at=observed_at,
         retrieved_at=retrieved_at,
-        temperature_c=_number(attrs.get("temperature")),
+        temperature_c=normalize_temperature_c(attrs.get("temperature"), attrs.get("temperature_unit")),
         feels_like_c=_number(attrs.get("apparent_temperature")),
         wind_kmh=_wind_kmh(attrs.get("wind_speed"), wind_unit),
         precipitation_mm=_rain_mm(attrs.get("precipitation"), rain_unit),

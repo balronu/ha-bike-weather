@@ -1,14 +1,14 @@
-# Bike Weather
+# Bike Weather – deutsche Dokumentation
 
-Lokale Phase-3-Beta-Entwicklung einer Home-Assistant-Custom-Integration unter
-der Domain `bike_weather`. Diese Arbeitskopie ist noch nicht veröffentlicht
-und nicht in VM 104 installiert.
+Dies ist die kompatible deutsche README-Datei. Die vollständige deutsche
+Dokumentation steht in [README.md](README.md).
 
-## Status
+Die Beta-3-Arbeitsfassung verbessert den Config Flow mit nativen
+EntitySelectoren, erkennt eindeutige lokale Wetterstationssensoren,
+normalisiert °C/°F, km/h/m/s/mph und Regenraten, lokalisiert Provider und
+Options Flow und bringt eine responsive Karte mit visuellem Editor.
 
-Die Beta enthält Config-/Options-Flow, providerneutrale Normalisierung,
-Quellen-Fallback, Sensoren, Diagnostics, WebSocket-Kartendaten und die
-`bike-weather-card`. HA-Laufzeit, Browser, Hassfest und HACS müssen vor einer
-Installation noch in isolierter Umgebung geprüft werden.
-
-Siehe [Phase-3-Bericht](docs/PHASE3-REPORT.md) und [Installation](docs/INSTALLATION.md).
+Installation, Konfiguration, Datenpriorität, Score, Datenschutz, Tests und
+Einschränkungen sind vollständig in [README.md](README.md) beschrieben.
+Produktive HACS-Installation und Praxistest erfolgen ausschließlich durch
+den Nutzer.

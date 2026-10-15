@@ -8,6 +8,13 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE
 from homeassistant.core import callback
+from homeassistant.helpers.selector import (
+    EntitySelector,
+    EntitySelectorConfig,
+    SelectSelector,
+    SelectSelectorConfig,
+    SelectSelectorMode,
+)
 
 from .const import *
 
@@ -35,7 +42,10 @@ class BikeWeatherConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     title=user_input[CONF_NAME], data=user_input
                 )
         return self.async_show_form(
-            step_id="user", data_schema=_user_schema(self.hass), errors=errors
+            step_id="user",
+            data_schema=_user_schema(self.hass),
+            errors=errors,
+            description_placeholders=_suggestions(self.hass),
         )
 
     @staticmethod
@@ -54,24 +64,78 @@ class BikeWeatherOptionsFlow(config_entries.OptionsFlow):
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)
         values = {**self.config_entry.data, **self.config_entry.options}
-        return self.async_show_form(step_id="init", data_schema=_options_schema(values))
+        return self.async_show_form(
+            step_id="init",
+            data_schema=_options_schema(values, self.config_entry.hass.config.language),
+            description_placeholders=_suggestions(self.config_entry.hass),
+        )
+
+
+def _entity(domain: str, device_class: str | None = None):
+    config = {"domain": domain}
+    if device_class:
+        config["device_class"] = device_class
+    return EntitySelector(EntitySelectorConfig(**config))
+
+
+def _provider_selector(language: str = "de"):
+    labels = {
+        "de": {
+            PROVIDER_HA: "Home-Assistant-Wetterintegration",
+            PROVIDER_OPENWEATHER: "OpenWeatherMap",
+            PROVIDER_NONE: "Kein zusätzlicher Wetteranbieter",
+        },
+        "en": {
+            PROVIDER_HA: "Home Assistant weather integration",
+            PROVIDER_OPENWEATHER: "OpenWeatherMap",
+            PROVIDER_NONE: "No additional weather provider",
+        },
+    }.get(language.split("-")[0], {
+        PROVIDER_HA: "Home Assistant weather integration",
+        PROVIDER_OPENWEATHER: "OpenWeatherMap",
+        PROVIDER_NONE: "No additional weather provider",
+    })
+    return SelectSelector(
+        SelectSelectorConfig(
+            options=[
+                {"value": key, "label": labels[key]}
+                for key in (PROVIDER_HA, PROVIDER_OPENWEATHER, PROVIDER_NONE)
+            ],
+            mode=SelectSelectorMode.DROPDOWN,
+        )
+    )
+
+
+def _suggestions(hass):
+    def pick(kind):
+        candidates = []
+        for state in hass.states.async_all("sensor"):
+            unit = str(state.attributes.get("unit_of_measurement", "")).lower()
+            device_class = state.attributes.get("device_class")
+            if kind == "temperature" and (device_class == "temperature" or unit in {"°c", "°f", "c", "f"}) or kind == "wind" and (device_class == "wind_speed" or unit in {"km/h", "m/s", "mph"}) or kind == "rain" and (device_class in {"precipitation_intensity", "precipitation"} or unit in {"mm/h", "in/h", "mm", "in"}):
+                candidates.append(state.entity_id)
+        return candidates[0] if len(candidates) == 1 else ""
+    return {
+        "temperature_entity": pick("temperature"),
+        "wind_entity": pick("wind"),
+        "rain_entity": pick("rain"),
+    }
 
 
 def _user_schema(hass):
+    suggestions = _suggestions(hass)
     return vol.Schema(
         {
             vol.Required(CONF_NAME, default=DEFAULT_NAME): vol.All(
                 str, vol.Length(min=1, max=64)
             ),
-            vol.Required(CONF_PROVIDER, default=DEFAULT_PROVIDER): vol.In(
-                [PROVIDER_HA, PROVIDER_OPENWEATHER, PROVIDER_NONE]
-            ),
-            vol.Optional(CONF_WEATHER_ENTITY, default=""): str,
+            vol.Required(CONF_PROVIDER, default=DEFAULT_PROVIDER): _provider_selector(hass.config.language),
+            vol.Optional(CONF_WEATHER_ENTITY, default=""): _entity("weather"),
             vol.Optional(CONF_API_KEY, default=""): str,
             vol.Required(CONF_LOCAL_ENABLED, default=False): bool,
-            vol.Optional(CONF_TEMPERATURE_ENTITY, default=""): str,
-            vol.Optional(CONF_WIND_ENTITY, default=""): str,
-            vol.Optional(CONF_RAIN_ENTITY, default=""): str,
+            vol.Optional(CONF_TEMPERATURE_ENTITY, default=suggestions["temperature_entity"]): _entity("sensor", "temperature"),
+            vol.Optional(CONF_WIND_ENTITY, default=suggestions["wind_entity"]): _entity("sensor", "wind_speed"),
+            vol.Optional(CONF_RAIN_ENTITY, default=suggestions["rain_entity"]): _entity("sensor"),
             vol.Required(CONF_LATITUDE, default=hass.config.latitude): vol.Coerce(
                 float
             ),
@@ -82,28 +146,28 @@ def _user_schema(hass):
     )
 
 
-def _options_schema(values):
+def _options_schema(values, language: str = "de"):
     return vol.Schema(
         {
             vol.Required(
                 CONF_PROVIDER, default=values.get(CONF_PROVIDER, DEFAULT_PROVIDER)
-            ): vol.In([PROVIDER_HA, PROVIDER_OPENWEATHER, PROVIDER_NONE]),
+            ): _provider_selector(language),
             vol.Optional(
                 CONF_WEATHER_ENTITY, default=values.get(CONF_WEATHER_ENTITY, "")
-            ): str,
+            ): _entity("weather"),
             vol.Optional(CONF_API_KEY, default=values.get(CONF_API_KEY, "")): str,
             vol.Required(
                 CONF_LOCAL_ENABLED, default=values.get(CONF_LOCAL_ENABLED, False)
             ): bool,
             vol.Optional(
                 CONF_TEMPERATURE_ENTITY, default=values.get(CONF_TEMPERATURE_ENTITY, "")
-            ): str,
+            ): _entity("sensor", "temperature"),
             vol.Optional(
                 CONF_WIND_ENTITY, default=values.get(CONF_WIND_ENTITY, "")
-            ): str,
+            ): _entity("sensor", "wind_speed"),
             vol.Optional(
                 CONF_RAIN_ENTITY, default=values.get(CONF_RAIN_ENTITY, "")
-            ): str,
+            ): _entity("sensor"),
             vol.Required(
                 CONF_REFRESH_MINUTES,
                 default=values.get(CONF_REFRESH_MINUTES, DEFAULT_REFRESH_MINUTES),

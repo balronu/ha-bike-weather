@@ -141,20 +141,28 @@ class BikeWeatherCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         }
 
     def _local_observation(self, now: datetime) -> WeatherObservation | None:
-        def value(entity_key: str):
+        def value(entity_key: str, kind: str):
             entity_id = self.options.get(entity_key)
             state = self.hass.states.get(entity_id) if entity_id else None
             if not state or state.state in ("unknown", "unavailable"):
                 return None
             try:
-                return float(state.state)
+                raw = float(state.state)
             except (TypeError, ValueError):
                 return None
+            unit = str(state.attributes.get("unit_of_measurement", "")).lower()
+            if kind == "temperature":
+                return (raw - 32) * 5 / 9 if unit in {"°f", "f"} else raw if unit in {"°c", "c"} else None
+            if kind == "wind":
+                return raw * 3.6 if unit in {"m/s", "mps"} else raw * 1.609344 if unit == "mph" else raw if unit in {"km/h", "kph"} else None
+            if kind == "rain":
+                return raw * 25.4 if unit in {"in/h", "inch/h", "in"} else raw if unit in {"mm/h", "mm", ""} else None
+            return None
 
         temperature, wind, rain = (
-            value(CONF_TEMPERATURE_ENTITY),
-            value(CONF_WIND_ENTITY),
-            value(CONF_RAIN_ENTITY),
+            value(CONF_TEMPERATURE_ENTITY, "temperature"),
+            value(CONF_WIND_ENTITY, "wind"),
+            value(CONF_RAIN_ENTITY, "rain"),
         )
         if temperature is None and wind is None and rain is None:
             return None
@@ -166,6 +174,7 @@ class BikeWeatherCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             temperature_c=temperature,
             wind_kmh=wind,
             precipitation_mm=rain,
+            rain_rate_mmh=rain,
             quality=DataQuality.GOOD
             if all(x is not None for x in (temperature, wind, rain))
             else DataQuality.PARTIAL,

@@ -7,12 +7,15 @@ from pathlib import Path
 from homeassistant.components.frontend import add_extra_js_url
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import config_validation as cv
 
 from .api import async_setup_websocket
 from .const import CARD_URL, DOMAIN, PLATFORMS
 from .coordinator import BikeWeatherCoordinator
 
 _CARD_REGISTERED = "card_registered"
+
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:

@@ -12,7 +12,8 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from bike_weather_core import (
+from .const import *
+from .core import (
     DataQuality,
     RideProfile,
     WeatherObservation,
@@ -24,8 +25,6 @@ from bike_weather_core import (
     from_ha_weather_state,
     from_openweather,
 )
-
-from .const import *
 
 LOGGER = logging.getLogger(__name__)
 OWM_URL = "https://api.openweathermap.org/data/2.5/forecast"

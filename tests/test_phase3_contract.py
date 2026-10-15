@@ -51,6 +51,12 @@ class Phase3ContractTests(unittest.TestCase):
         self.assertIn("async_redact_data", diagnostics)
         self.assertIn("CONF_API_KEY", diagnostics)
 
+    def test_hacs_package_bundles_runtime_core(self):
+        coordinator = (ROOT / "custom_components/bike_weather/coordinator.py").read_text()
+        self.assertIn("from .core import", coordinator)
+        self.assertNotIn("from bike_weather_core import", coordinator)
+        self.assertTrue((ROOT / "custom_components/bike_weather/core.py").is_file())
+
 
 if __name__ == "__main__":
     unittest.main()

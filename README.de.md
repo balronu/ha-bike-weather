@@ -3,7 +3,7 @@
 Dies ist die kompatible deutsche README-Datei. Die vollständige deutsche
 Dokumentation steht in [README.md](README.md).
 
-Die Beta-4-Arbeitsfassung verbessert den Config Flow mit nativen
+Die unveröffentlichte Beta-4-Arbeitsfassung verbessert den Config Flow mit nativen
 EntitySelectoren, erkennt eindeutige lokale Wetterstationssensoren,
 normalisiert °C/°F, km/h/m/s/mph und Regenraten, lokalisiert Provider und
 Options Flow und bringt eine responsive Karte mit visuellem Editor. Zusätzlich

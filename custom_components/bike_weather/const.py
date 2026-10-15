@@ -43,4 +43,5 @@ DEFAULT_PROFILE = "standard"
 DEFAULT_UPDATE_INTERVAL = timedelta(minutes=DEFAULT_REFRESH_MINUTES)
 CARD_URL = "/bike_weather/bike-weather-card.js"
 WS_CARD_DATA = "bike_weather/card_data"
-CARD_VERSION = "0.1.0-beta.6"
+WS_LIST_ENTRIES = "bike_weather/list_entries"
+CARD_VERSION = "0.1.0-beta.7"

@@ -4,7 +4,7 @@
 
 🇩🇪 **Deutsch** | [🇬🇧 English](README.en.md)
 
-> **Veröffentlicht: `v0.1.0-beta.6` – nicht als Stable-Version verwenden.**
+> **Veröffentlicht: `v0.1.0-beta.7` – nicht als Stable-Version verwenden.**
 > Installation und Praxistest über HACS erfolgen ausschließlich durch den Nutzer.
 
 ## Überblick
@@ -20,7 +20,7 @@ Frischeprüfung priorisiert:
 
 Fehlende oder ungültige Werte werden nie stillschweigend als 0 behandelt.
 
-## Beta-6-Funktionen
+## Beta-7-Funktionen
 
 - native EntitySelectoren statt freier Entity-ID-Eingabe;
 - eindeutige Vorauswahl kompatibler lokaler Sensoren;
@@ -42,7 +42,7 @@ Home Assistant 2026.10.x oder neuer und HACS werden vorausgesetzt.
 
 1. In HACS Benutzerdefinierte Repositories öffnen.
 2. balronu/ha-bike-weather als Repository-Typ Integration hinzufügen.
-3. Vorabversionen aktivieren und den veröffentlichten Release `v0.1.0-beta.6` auswählen.
+3. Vorabversionen aktivieren und den veröffentlichten Release `v0.1.0-beta.7` auswählen.
 4. Nach dem Download Home Assistant nach Aufforderung neu starten.
 5. Einstellungen → Geräte & Dienste → Integration hinzufügen → Bike Weather.
 
@@ -90,7 +90,6 @@ Datenalter, Aktualisierung, Score-Grenze, Fahrzeitfenster und Fahrtdauer zu
 
 ~~~yaml
 type: custom:bike-weather-card
-entry_id: DEINE_CONFIG_ENTRY_ID
 show_forecast: true
 show_details: true
 ride_start: "07:30"
@@ -100,7 +99,7 @@ ride_duration_minutes: 60
 Die Karte zeigt Score, Bewertung, Temperatur, Wind, Regenrate, Prognose,
 Fahrzeitfenster, Fahrtdauer, Datenquelle und Datenqualität. Fehlende oder
 veraltete Daten werden ausdrücklich angezeigt. Der visuelle Karteneditor
-kann entry_id, Prognose/Details, Startzeit und Fahrtdauer ändern.
+kann die erkannte Integration, Prognose/Details, Startzeit und Fahrtdauer ändern.
 
 ## Bewertung
 
@@ -115,7 +114,7 @@ werden durch Tests abgesichert.
 
 Lokale Sensoren und Home-Assistant-Wetterdaten bleiben lokal. OpenWeatherMap
 wird nur bei ausdrücklicher Auswahl und mit eigenem API-Schlüssel kontaktiert.
-Beta 6 ist nicht als Stable freigegeben. Produktive HA-Installation,
+Beta 7 ist nicht als Stable freigegeben. Produktive HA-Installation,
 HACS-Update und Praxistest sind nicht Bestandteil dieses Branches.
 
 ## Entwicklung und Tests
@@ -140,7 +139,7 @@ diesem Branch nicht enthalten; die Browser-/HA-Laufzeitprüfung bleibt offen.
 - [Karte](docs/CARD.md)
 - [Installation](docs/INSTALLATION.md)
 - [Branding-Hinweise](BRANDING.md)
-- [Beta-6-Release Notes](docs/releases/v0.1.0-beta.6.md)
+- [Beta-7-Release Notes](docs/releases/v0.1.0-beta.7.md)
 
 ## Lizenz
 

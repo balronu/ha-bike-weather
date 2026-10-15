@@ -61,12 +61,23 @@ class BikeWeatherOptionsFlow(config_entries.OptionsFlow):
         self.config_entry = config_entry
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None):
+        errors: dict[str, str] = {}
         if user_input is not None:
-            return self.async_create_entry(title="", data=user_input)
+            if user_input.get(CONF_PROVIDER) == PROVIDER_NONE and not user_input.get(
+                CONF_LOCAL_ENABLED
+            ):
+                errors["base"] = "no_source"
+            elif user_input.get(
+                CONF_PROVIDER
+            ) == PROVIDER_OPENWEATHER and not user_input.get(CONF_API_KEY):
+                errors["base"] = "api_key_required"
+            else:
+                return self.async_create_entry(title="", data=user_input)
         values = {**self.config_entry.data, **self.config_entry.options}
         return self.async_show_form(
             step_id="init",
             data_schema=_options_schema(values, self.config_entry.hass.config.language),
+            errors=errors,
             description_placeholders=_suggestions(self.config_entry.hass),
         )
 

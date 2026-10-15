@@ -30,6 +30,16 @@ def test_config_flow_uses_native_selectors_and_no_hardcoded_gw1100a_ids():
     assert "gw1100a" not in flow.lower()
 
 
+def test_options_flow_revalidates_provider_requirements():
+    flow = (INTEGRATION / "config_flow.py").read_text()
+    options = flow.split("class BikeWeatherOptionsFlow", 1)[1].split(
+        "def _entity", 1
+    )[0]
+    assert 'errors["base"] = "no_source"' in options
+    assert 'errors["base"] = "api_key_required"' in options
+    assert 'errors=errors' in options
+
+
 def test_translations_have_matching_field_keys():
     strings = json.loads((INTEGRATION / "strings.json").read_text())
     de = json.loads((INTEGRATION / "translations" / "de.json").read_text())
@@ -53,3 +63,8 @@ def test_branding_dimensions_and_card_version():
     card = (INTEGRATION / "www" / "bike-weather-card.js").read_text()
     assert 'VERSION = "0.1.0-beta.3"' in card
     assert "config-changed" in card
+    assert "translatedStatus" in card
+    assert "translatedQuality" in card
+    assert "translatedSource" in card
+    assert "providerError" in card
+    assert "connectionError" in card

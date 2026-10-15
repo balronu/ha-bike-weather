@@ -26,11 +26,11 @@ nicht.
 | mypy | PASS | 2.4.0, `bike_weather_core`, ohne fehlende HA-Imports |
 | Node.js | PASS | v24.21.0 |
 | Playwright CLI | PASS | 1.64.1 verfügbar; Chromium vorhanden |
-| Home Assistant | BLOCKED | Resolver scheitert bei HA 2026.2.3 an Bluetooth-Abhängigkeiten |
+| Home Assistant | BLOCKED | Kontrollierter Wheel-Pfad geprüft; venv-Laufzeit scheitert danach an fehlendem Build-Input `setuptools` für `lru-dict==1.3.0` |
 | pytest-homeassistant-custom-component | BLOCKED | Installation zieht denselben nicht abgeschlossenen HA-Resolverpfad |
 | Hassfest | NOT RUN | kein lokales Tool/Container |
 | HACS-Validator | NOT RUN | kein lokales Tool/Container |
-| Gitleaks | NOT RUN | Binary nicht vorhanden |
+| Gitleaks | PASS | offizielles v8.30.0-Linux-x64-Binary, SHA-256 verifiziert, Scan ohne Treffer |
 | Docker/Podman | NOT RUN | nicht vorhanden |
 
 Die HA-Installationsversuche liefen ausschließlich in `.venv-phase4`; es
@@ -51,6 +51,44 @@ Die lokale `.venv-phase4` ist für Offline-Prüfungen verwendbar und enthält
 Python 3.13.5, pip 26.2.1, pytest, Ruff und mypy. `uv` ist nicht installiert;
 eine vollständige HA-Testumgebung steht weiterhin nicht zur Verfügung.
 
+## Untersuchung der Bluetooth-Abhängigkeiten
+
+Die Paketmetadaten aus dem abgebrochenen Resolverlauf wurden ohne erneuten
+Resolverlauf ausgewertet:
+
+```text
+homeassistant==2026.2.3
+└─ home-assistant-bluetooth==1.13.1
+   └─ habluetooth>=3.0
+      ├─ bleak>=1.0.1 (ab habluetooth 6.1.0: >=3.0.2)
+      ├─ bleak-retry-connector>=4.2.0 (ab 6.1.0: >=4.6.0)
+      ├─ bluetooth-adapters>=2.1.0
+      ├─ bluetooth-auto-recovery>=1.5.1
+      ├─ bluetooth-data-tools>=1.28.0
+      └─ dbus-fast>=2.30.2 (Linux)
+```
+
+Es wurde kein widersprüchlicher harter Bluetooth-Pin gefunden. Pip wählte beim
+freien Lauf jedoch neuere `habluetooth`-Kandidaten bis 7.1.2; diese verlangen
+`bluetooth-data-tools>=1.29.24`. Für mehrere dieser Versionen lagen nur
+Source-Distributionen vor, wodurch der Resolver wiederholt Metadaten und
+Builds für `bluetooth-data-tools` erzeugte. Der beobachtete Stillstand war
+damit Resolver-/Source-Build-Churn, kein nachgewiesener inkompatibler
+Bluetooth-Pin.
+
+Ein kontrollierter, kompatibler Kandidat wurde aus bereits vorhandenen Wheels
+geprüft: `habluetooth==6.1.0`, `bluetooth-data-tools==1.28.4`,
+`bleak==3.0.2`, `bleak-retry-connector==4.7.1`,
+`bluetooth-adapters==2.4.0`, `bluetooth-auto-recovery==1.6.4` und
+`dbus-fast==5.2.0`. Die Installation in eine Kopie der Offline-venv wurde
+nach fester 90-Sekunden-Grenze abgebrochen, weil `lru-dict==1.3.0` nur als
+Source-Paket vorlag und dessen isolierter Build `setuptools>=61` benötigte,
+das in der Umgebung nicht vorhanden ist. Es wurde kein Systempaket installiert
+und kein inkompatibler Versionszwang verwendet. Ein sinnvoller nächster Weg
+ist ein vorab bereitgestelltes, reproduzierbares Wheelhouse inklusive
+`setuptools`/`lru-dict` oder ein CI-Runner mit `python3.13-venv`; danach muss
+die vollständige HA-Suite erneut gegen die festgelegte HA-Version laufen.
+
 ## Tatsächlich ausgeführte Tests
 
 | Prüfung | Ergebnis | Details |
@@ -64,9 +102,9 @@ eine vollständige HA-Testumgebung steht weiterhin nicht zur Verfügung.
 | JavaScript Syntax | PASS | `node --check` für die Karte |
 | Git-Diff-Check | PASS | keine Whitespace-Fehler |
 | Manuelle Secret-/Private-Reference-Suche | PASS | keine produktiven Schlüssel/privaten URLs im neuen Kandidaten |
-| Gitleaks | NOT RUN | lokales Binary fehlt |
-| Hassfest | BLOCKED | HA-/Validatorumgebung fehlt |
-| HACS-Validierung | BLOCKED | Validatorumgebung fehlt |
+| Gitleaks | PASS | v8.30.0 offizielles Binary; Download mit festen Timeouts, SHA-256 `79a3ab57…2470a66e` verifiziert; `detect` exit 0, keine Leaks |
+| Hassfest | NOT RUN | Workflow vorhanden, aber kein lokales Hassfest und kein Docker/Podman; keine Veröffentlichung zum Auslösen von CI |
+| HACS-Validierung | NOT RUN | Workflow vorhanden, aber kein lokaler HACS-Runner und kein Docker/Podman; keine Veröffentlichung zum Auslösen von CI |
 
 ## Lovelace-/Browserstatus
 
@@ -84,6 +122,17 @@ HA-Resource-Registration in einer echten HA-Instanz, Cache-Verhalten nach
 Versionswechsel, Light-/Dark-Mode gegen HA-Themes, Browser-Konsole in einer
 isolierten HA-Instanz und echte Config-Entry-Auswahl über HA-WebSocket.
 
+Der gezielte Chromium-Lauf auf `/usr/bin/chromium` wurde mit dem vorhandenen
+Playwright-Core in einer isolierten Browserseite wiederholt:
+
+| Browserfall | Ergebnis | Nachweis |
+|---|---|---|
+| Desktop 1280×900 | PASS | Registrierung genau einmal, ein `callWS`, Score/Temperatur gerendert, Editor-Event, kein Overflow |
+| Mobile 390×844 | PASS | dieselben Assertions, kein Overflow |
+| Browser-Konsole/Page-Fehler | PASS | keine Console-Errors und keine `pageerror`-Meldungen |
+| wiederholtes Bundle-Laden | PASS | idempotente `window.customCards`-/Custom-Element-Registrierung |
+| echte HA-Resource-/HTTP-Cache-Header | BLOCKED | keine laufende HA-Webserver-Instanz; nur statisches Bundle geprüft |
+
 ## Backend-Abdeckung
 
 Offline abgedeckt sind Normalisierung von lokaler/HA/OpenWeatherMap-Quelle,
@@ -95,7 +144,9 @@ Forecast-Abgrenzung aus Sensorattributen sind durch Contract-Tests abgedeckt.
 Nicht ausgeführt sind Config-Flow/Options-Flow gegen HA, Setup/Unload/Reload
 echter Config Entries, mehrere HA-Instanzen, echter Coordinator-Lifecycle,
 HA-Weather-Adapter mit HA-State-Machine, authentifizierter HA-WebSocket gegen
-eine laufende Instanz und native Diagnostics-Ausgabe.
+eine laufende Instanz und native Diagnostics-Ausgabe. Damit ist auch der
+gemeinsame End-to-End-Test von Flow, Options Flow, Coordinator, WebSocket und
+Karte BLOCKED.
 
 ## Hot-Cutover-Simulation
 
@@ -146,8 +197,8 @@ Automationen, Skripte und Wetterintegrationen blieben unverändert.
   vor dem Cutover erneut anhand Live-Zustand/Registry bestätigt werden.
 - Ein echter Browser-Test muss gegen eine isolierte HA-Instanz mit gültiger
   Authentifizierung und registrierter Resource wiederholt werden.
-- Hassfest, HACS und Gitleaks müssen in CI oder einer bereitgestellten
-  isolierten Toolchain grün laufen.
+- Hassfest und HACS müssen in CI oder einer bereitgestellten isolierten
+  Toolchain grün laufen; Gitleaks ist lokal bereits PASS.
 
 ## Git- und Sicherheitsgrenzen
 

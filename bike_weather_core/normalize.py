@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable, Mapping
 from datetime import UTC, datetime, timedelta
 from math import isfinite
-from typing import Any, Iterable, Mapping
+from typing import Any
 
 from .models import DataQuality, ForecastSlot, Metric, WeatherObservation, WeatherSource
 
@@ -17,6 +18,10 @@ def _number(value: Any) -> float | None:
     except (TypeError, ValueError):
         return None
     return result if isfinite(result) else None
+
+
+def _mapping(value: Any) -> Mapping[str, Any]:
+    return value if isinstance(value, Mapping) else {}
 
 
 def _aware(value: datetime) -> datetime:
@@ -53,7 +58,7 @@ def from_ha_weather_state(
     observed_at: datetime | None = None,
 ) -> WeatherObservation:
     """Normalize a HA weather entity state without inventing missing values."""
-    attrs = state.get("attributes", state)
+    attrs = _mapping(state.get("attributes", state))
     retrieved_at = _aware(retrieved_at)
     observed_at = _aware(observed_at or retrieved_at)
     wind_unit = attrs.get("wind_speed_unit")
@@ -69,7 +74,9 @@ def from_ha_weather_state(
         precipitation_probability_pct=_number(attrs.get("precipitation_probability")),
         condition=state.get("state") if state.get("state") else None,
         quality=DataQuality.GOOD,
-        metadata={"entity_id": state.get("entity_id")} if state.get("entity_id") else {},
+        metadata={"entity_id": state.get("entity_id")}
+        if state.get("entity_id")
+        else {},
     )
 
 
@@ -87,21 +94,38 @@ def from_ha_forecast(
     created.
     """
     retrieved_at = _aware(retrieved_at)
-    rows = [row for row in forecast if isinstance(row, Mapping) and isinstance(row.get("datetime"), datetime)]
+    rows = [
+        row
+        for row in forecast
+        if isinstance(row, Mapping) and isinstance(row.get("datetime"), datetime)
+    ]
     starts = [_aware(row["datetime"]) for row in rows]
     result: list[ForecastSlot] = []
     for index, row in enumerate(rows):
-        end = starts[index + 1] if index + 1 < len(starts) and starts[index + 1] > starts[index] else starts[index] + default_interval
+        end = (
+            starts[index + 1]
+            if index + 1 < len(starts) and starts[index + 1] > starts[index]
+            else starts[index] + default_interval
+        )
         result.append(
             ForecastSlot(
-                source=source, starts_at=starts[index], ends_at=end, retrieved_at=retrieved_at,
+                source=source,
+                starts_at=starts[index],
+                ends_at=end,
+                retrieved_at=retrieved_at,
                 temperature_c=_number(row.get("temperature")),
                 feels_like_c=_number(row.get("apparent_temperature")),
                 wind_kmh=_wind_kmh(row.get("wind_speed"), row.get("wind_speed_unit")),
                 gust_kmh=_wind_kmh(row.get("wind_gust"), row.get("wind_speed_unit")),
-                precipitation_mm=_rain_mm(row.get("precipitation"), row.get("precipitation_unit")),
-                precipitation_probability_pct=_number(row.get("precipitation_probability")),
-                condition=row.get("condition") if isinstance(row.get("condition"), str) else None,
+                precipitation_mm=_rain_mm(
+                    row.get("precipitation"), row.get("precipitation_unit")
+                ),
+                precipitation_probability_pct=_number(
+                    row.get("precipitation_probability")
+                ),
+                condition=row.get("condition")
+                if isinstance(row.get("condition"), str)
+                else None,
             )
         )
     return tuple(result)
@@ -133,34 +157,57 @@ def from_openweather(
     return current, tuple(slots)
 
 
-def _owm_observation(source: WeatherSource, raw: Mapping[str, Any], retrieved: datetime) -> WeatherObservation:
-    main = raw.get("main") if isinstance(raw.get("main"), Mapping) else {}
-    wind = raw.get("wind") if isinstance(raw.get("wind"), Mapping) else {}
-    rain = raw.get("rain") if isinstance(raw.get("rain"), Mapping) else {}
+def _owm_observation(
+    source: WeatherSource, raw: Mapping[str, Any], retrieved: datetime
+) -> WeatherObservation:
+    main = _mapping(raw.get("main"))
+    wind = _mapping(raw.get("wind"))
+    rain = _mapping(raw.get("rain"))
     weather = raw.get("weather") if isinstance(raw.get("weather"), list) else []
     dt = datetime.fromtimestamp(float(raw.get("dt", retrieved.timestamp())), UTC)
     return WeatherObservation(
-        source=source, observed_at=dt, retrieved_at=retrieved,
-        temperature_c=_number(main.get("temp")), feels_like_c=_number(main.get("feels_like")),
-        wind_kmh=_wind_kmh(wind.get("speed"), "m/s"), gust_kmh=_wind_kmh(wind.get("gust"), "m/s"),
+        source=source,
+        observed_at=dt,
+        retrieved_at=retrieved,
+        temperature_c=_number(main.get("temp")),
+        feels_like_c=_number(main.get("feels_like")),
+        wind_kmh=_wind_kmh(wind.get("speed"), "m/s"),
+        gust_kmh=_wind_kmh(wind.get("gust"), "m/s"),
         precipitation_mm=_rain_mm(rain.get("1h"), "mm"),
         precipitation_probability_pct=None,
-        condition=weather[0].get("description") if weather and isinstance(weather[0], Mapping) else None,
+        condition=weather[0].get("description")
+        if weather and isinstance(weather[0], Mapping)
+        else None,
     )
 
 
-def _owm_slot(source: WeatherSource, raw: Mapping[str, Any], starts: datetime, ends: datetime, retrieved: datetime) -> ForecastSlot:
-    main = raw.get("main") if isinstance(raw.get("main"), Mapping) else {}
-    wind = raw.get("wind") if isinstance(raw.get("wind"), Mapping) else {}
-    rain = raw.get("rain") if isinstance(raw.get("rain"), Mapping) else {}
+def _owm_slot(
+    source: WeatherSource,
+    raw: Mapping[str, Any],
+    starts: datetime,
+    ends: datetime,
+    retrieved: datetime,
+) -> ForecastSlot:
+    main = _mapping(raw.get("main"))
+    wind = _mapping(raw.get("wind"))
+    rain = _mapping(raw.get("rain"))
     weather = raw.get("weather") if isinstance(raw.get("weather"), list) else []
+    probability = _number(raw.get("pop"))
+    probability_pct = probability * 100 if probability is not None else None
     return ForecastSlot(
-        source=source, starts_at=starts, ends_at=ends, retrieved_at=retrieved,
-        temperature_c=_number(main.get("temp")), feels_like_c=_number(main.get("feels_like")),
-        wind_kmh=_wind_kmh(wind.get("speed"), "m/s"), gust_kmh=_wind_kmh(wind.get("gust"), "m/s"),
+        source=source,
+        starts_at=starts,
+        ends_at=ends,
+        retrieved_at=retrieved,
+        temperature_c=_number(main.get("temp")),
+        feels_like_c=_number(main.get("feels_like")),
+        wind_kmh=_wind_kmh(wind.get("speed"), "m/s"),
+        gust_kmh=_wind_kmh(wind.get("gust"), "m/s"),
         precipitation_mm=_rain_mm(rain.get("3h"), "mm"),
-        precipitation_probability_pct=(lambda p: p * 100 if p is not None else None)(_number(raw.get("pop"))),
-        condition=weather[0].get("description") if weather and isinstance(weather[0], Mapping) else None,
+        precipitation_probability_pct=probability_pct,
+        condition=weather[0].get("description")
+        if weather and isinstance(weather[0], Mapping)
+        else None,
         metadata={"raw_interval": interval_seconds(starts, ends)},
     )
 
@@ -180,22 +227,32 @@ def choose_metric_observations(
     """Choose each metric independently by priority, availability and age."""
     now = _aware(now)
     valid = [
-        item for item in observations
+        item
+        for item in observations
         if item.quality == DataQuality.GOOD
         and now - item.retrieved_at <= max_age
         and item.retrieved_at <= now + timedelta(seconds=1)
     ]
     result: dict[Metric, WeatherObservation | None] = {}
     fields = {
-        "temperature": "temperature_c", "feels_like": "feels_like_c", "wind": "wind_kmh",
-        "gust": "gust_kmh", "rain": "precipitation_mm", "rain_rate": "rain_rate_mmh",
+        "temperature": "temperature_c",
+        "feels_like": "feels_like_c",
+        "wind": "wind_kmh",
+        "gust": "gust_kmh",
+        "rain": "precipitation_mm",
+        "rain_rate": "rain_rate_mmh",
         "probability": "precipitation_probability_pct",
     }
     for metric, source_ids in priorities.items():
         field_name = fields.get(metric, metric)
         result[metric] = next(
-            (item for source_id in source_ids for item in valid
-             if item.source.source_id == source_id and getattr(item, field_name, None) is not None),
+            (
+                item
+                for source_id in source_ids
+                for item in valid
+                if item.source.source_id == source_id
+                and getattr(item, field_name, None) is not None
+            ),
             None,
         )
     return result

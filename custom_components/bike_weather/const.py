@@ -1,4 +1,5 @@
 """Constants for Bike Weather."""
+
 from __future__ import annotations
 
 from datetime import timedelta

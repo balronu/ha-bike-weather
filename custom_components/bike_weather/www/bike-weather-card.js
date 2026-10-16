@@ -6,6 +6,7 @@
   const CARD_DATA = "bike_weather/card_data";
   const RIDE_DATA = "bike_weather/spontaneous_ride";
   const DURATIONS = [15, 30, 45, 60, 90, 120];
+  let standaloneCounter = 0;
   const DEFAULT_CONFIG = {show_forecast:true, show_details:true, ride_start:"15:00", ride_duration_minutes:60};
   const registered = window.customCards || (window.customCards = []);
   if (!registered.some((card) => card.type === "bike-weather-card")) registered.push({type:"bike-weather-card", name:"Bike Weather", description:"Cycling weather score and forecast"});
@@ -32,18 +33,18 @@
     if (now >= value) { const d = new Date(`${get("year")}-${get("month")}-${get("day")}T12:00:00Z`); d.setUTCDate(d.getUTCDate() + 1); value = `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,"0")}-${String(d.getUTCDate()).padStart(2,"0")}T15:00`; }
     return value;
   }
-  function storageKey(config, entryId) { return `bike-weather:spontaneous:${config.spontaneous_ride_storage_key || entryId || "auto"}`; }
-  function readRide(config, hass, entryId) {
+  function storageKey(config, entryId, instanceKey) { return `bike-weather:spontaneous:${config.spontaneous_ride_storage_key || `${entryId || "auto"}:${instanceKey || "default"}`}`; }
+  function readRide(config, hass, entryId, instanceKey) {
     let saved = null;
-    try { saved = JSON.parse(localStorage.getItem(storageKey(config, entryId)) || "null"); } catch (_) {}
+    try { saved = JSON.parse(localStorage.getItem(storageKey(config, entryId, instanceKey)) || "null"); } catch (_) {}
     const start = saved?.start_at || config.ride_datetime || localDateTime(hass);
     const legacy = config.ride_start && /^\d{2}:\d{2}$/.test(config.ride_start);
     return {start_at: legacy && !saved && !config.ride_datetime ? `${localDateTime(hass).slice(0,10)}T${config.ride_start}` : start, duration_minutes: Number(saved?.duration_minutes || config.ride_duration_minutes || 60)};
   }
-  function saveRide(config, entryId, ride) { try { localStorage.setItem(storageKey(config, entryId), JSON.stringify(ride)); } catch (_) {} }
+  function saveRide(config, entryId, ride, instanceKey) { try { localStorage.setItem(storageKey(config, entryId, instanceKey), JSON.stringify(ride)); } catch (_) {} }
 
   class BikeWeatherCard extends HTMLElement {
-    constructor() { super(); this.config = {...DEFAULT_CONFIG}; this.data = null; this.rideData = null; this.loading = false; this.rideLoading = false; this.entryState = "loading"; this.error = null; this.rideError = null; this.ride = null; this._rideTimer = null; this._saveTimer = null; }
+    constructor() { super(); this.config = {...DEFAULT_CONFIG}; this.data = null; this.rideData = null; this.loading = false; this.rideLoading = false; this.entryState = "loading"; this.error = null; this.rideError = null; this.ride = null; this._rideTimer = null; this._saveTimer = null; this.instanceKey = `standalone-${++standaloneCounter}`; }
     setConfig(config) { this.config = {...DEFAULT_CONFIG, ...(config || {})}; this.data = null; this.rideData = null; this.error = null; this.entryState = "loading"; this.render(); if (this._hass) this.refresh(); }
     set hass(value) { this._hass = value; if (this._lastConnection !== value?.connection) { this._lastConnection = value?.connection; this.refresh(); } }
     async refresh() {
@@ -58,12 +59,24 @@
       if (selected && !selected.available) { this.error = t.entryUnavailable; this.entryState = "unavailable"; this.loading = false; this.render(); return; }
       if (!selected && available.length === 1) selected = available[0];
       if (!selected) { this.entryState = available.length ? "choose" : "none"; this.loading = false; this.render(); return; }
-      this.entryState = "selected"; this.ride = readRide(this.config, this._hass, selected.entry_id);
+      this.entryState = "selected"; this.instanceKey = this._dashboardInstanceKey(); this.ride = readRide(this.config, this._hass, selected.entry_id, this.instanceKey);
       try { this.data = await this._hass.callWS({type:CARD_DATA, entry_id:selected.entry_id}); this.error = null; await this.refreshRide(selected.entry_id); }
       catch (err) { this.error = t.connectionError; }
       this.loading = false; this.render();
     }
-    scheduleRide(entryId) { clearTimeout(this._rideTimer); this._rideTimer = setTimeout(() => this.refreshRide(entryId), 350); clearTimeout(this._saveTimer); this._saveTimer = setTimeout(() => saveRide(this.config, entryId, this.ride), 500); }
+    _dashboardInstanceKey() {
+      if (this.config.spontaneous_ride_storage_key) return this.config.spontaneous_ride_storage_key;
+      const path = [];
+      let node = this;
+      while (node && path.length < 8) {
+        const parent = node.parentElement;
+        if (!parent) break;
+        path.unshift(`${node.localName || "card"}:${Array.from(parent.children).indexOf(node)}`);
+        node = parent;
+      }
+      return path.join("/") || "standalone";
+    }
+    scheduleRide(entryId) { clearTimeout(this._rideTimer); this._rideTimer = setTimeout(() => this.refreshRide(entryId), 350); clearTimeout(this._saveTimer); this._saveTimer = setTimeout(() => saveRide(this.config, entryId, this.ride, this.instanceKey), 500); }
     async refreshRide(entryId) {
       if (!this._hass || !this.ride || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(this.ride.start_at) || !DURATIONS.includes(Number(this.ride.duration_minutes))) { this.rideError = strings(this._hass).invalid_start; this.render(); return; }
       this.rideLoading = true; this.rideError = null; this.render();

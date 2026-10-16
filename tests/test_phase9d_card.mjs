@@ -29,6 +29,9 @@ globalThis.customElements = {get: (name) => registry.get(name), define: (name, v
 globalThis.document = {createElement: (name) => { const Element = registry.get(name); return Element ? new Element() : new FakeElement(); }};
 globalThis.CustomEvent = class { constructor(type, init) { this.type = type; Object.assign(this, init?.detail || {}); } };
 vm.runInThisContext(fs.readFileSync("custom_components/bike_weather/www/bike-weather-card.js", "utf8"));
+const cardSource = fs.readFileSync("custom_components/bike_weather/www/bike-weather-card.js", "utf8");
+assert.match(cardSource, /spontaneous_ride_storage_key/);
+assert.match(cardSource, /_dashboardInstanceKey/);
 
 const data = {assessment: "good", score: 88, quality: "good", sources: ["ha_weather"], errors: [], current: {temperature_c: 18, wind_kmh: 4, precipitation_mm: 0}, forecast: []};
 const wait = () => new Promise((resolve) => setTimeout(resolve, 0));

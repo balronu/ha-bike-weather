@@ -16,8 +16,10 @@ Backend-Bewertungen; das Frontend berechnet keinen Score.
 
 Die Eingaben werden pro Karte/Integration im Browser-`localStorage` gesichert.
 `spontaneous_ride_storage_key` kann für zwei Karten mit derselben Integration
-explizit unterschiedlich gesetzt werden. Ohne Browser-Speicher funktioniert
-die Bewertung weiter, aber ohne Wiederherstellung.
+explizit unterschiedlich gesetzt werden. Ohne diesen Schlüssel wird die
+stabile Kartenposition im Dashboard einbezogen; beim dauerhaften Umsortieren
+kann dadurch ein neuer lokaler Speicher entstehen. Ohne Browser-Speicher
+funktioniert die Bewertung weiter, aber ohne Wiederherstellung.
 
 Ohne `entry_id` fragt die Karte über den authentifizierten read-only
 WebSocket-Befehl `bike_weather/list_entries` die geladenen Bike-Weather-

@@ -43,7 +43,9 @@ Datum/Uhrzeit und Dauer werden nach 350 ms entprellt abgefragt und nach 500 ms
 im kartenbezogenen Browser-`localStorage` gespeichert. Das ist reversibel,
 ändert keine Lovelace-Storage-Datei und beeinflusst andere Karten nicht, wenn
 `spontaneous_ride_storage_key` für gleichartige Karten unterschiedlich gesetzt
-wird. Ohne Schreibberechtigung bzw. privaten Speicher bleibt die Berechnung
+wird; ohne expliziten Schlüssel wird zusätzlich die stabile Kartenposition im
+Dashboard verwendet. Wird eine Karte dauerhaft umsortiert, kann sie dadurch
+eine neue lokale Persistenz erhalten. Ohne Schreibberechtigung bzw. privaten Speicher bleibt die Berechnung
 verfügbar. Die native `datetime-local`-Auswahl ist mobilfreundlich; CSS fällt
 bei schmalen Ansichten auf eine Spalte zurück.
 

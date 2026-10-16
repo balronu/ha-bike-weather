@@ -92,6 +92,25 @@ class RideAssessment:
     factor_weights_used: float = 0.0
 
 
+@dataclass(frozen=True, slots=True)
+class RideWindowAssessment:
+    """A score for a concrete future ride interval."""
+
+    start_at: datetime
+    end_at: datetime
+    assessment: RideAssessment
+    covered_until: datetime | None
+    slot_count: int
+    average_temperature_c: float | None = None
+    minimum_temperature_c: float | None = None
+    average_wind_kmh: float | None = None
+    maximum_wind_kmh: float | None = None
+    maximum_gust_kmh: float | None = None
+    maximum_precipitation_mm: float | None = None
+    maximum_precipitation_probability_pct: float | None = None
+    forecast_retrieved_at: datetime | None = None
+
+
 def _number(value: Any) -> float | None:
     if value is None or isinstance(value, bool):
         return None
@@ -274,4 +293,71 @@ def assess_score(observation, profile=None):
     return RideAssessment(status, score, quality, (observation.source.source_id,), reasons, scores, used)
 
 
-__all__ = ["DataQuality", "ForecastSlot", "RideAssessment", "RideProfile", "WeatherObservation", "WeatherSource", "assess_classic", "assess_score", "choose_metric_observations", "from_ha_forecast", "from_ha_weather_state", "from_openweather", "normalize_rain_rate_mmh", "normalize_temperature_c", "normalize_wind_kmh"]
+def _slot_overlaps(slot, start, end):
+    return slot.ends_at > start and slot.starts_at < end
+
+
+def _coverage(slots, start, end):
+    cursor = start
+    for slot in sorted(slots, key=lambda item: item.starts_at):
+        if slot.starts_at > cursor:
+            return cursor
+        cursor = max(cursor, slot.ends_at)
+        if cursor >= end:
+            return cursor
+    return cursor
+
+
+def assess_ride_window(slots, *, start_at, duration, profile=None):
+    """Assess every forecast slot touched by a concrete ride window.
+
+    The function deliberately does not interpolate hourly forecasts. A gap or
+    missing metric makes the result partial/unknown instead of optimistic.
+    """
+    if start_at.tzinfo is None:
+        raise ValueError("start_at must be timezone-aware")
+    if duration <= timedelta(0):
+        raise ValueError("duration must be positive")
+    end_at = start_at + duration
+    ordered = tuple(sorted(slots, key=lambda item: item.starts_at))
+    relevant = tuple(item for item in ordered if _slot_overlaps(item, start_at, end_at))
+    coverage = _coverage(relevant, start_at, end_at) if relevant else start_at
+    profile = profile or RideProfile()
+    assessments = tuple(assess_score(item, profile) for item in relevant)
+    if coverage < end_at:
+        result = RideAssessment(
+            "unknown", None, DataQuality.PARTIAL if relevant else DataQuality.UNAVAILABLE,
+            tuple(dict.fromkeys(source for item in assessments for source in item.source_ids)),
+            ("forecast_coverage_incomplete",),
+        )
+    elif not assessments:
+        result = RideAssessment("unknown", None, DataQuality.UNAVAILABLE, (), ("forecast_unavailable",))
+    else:
+        scores = [item.score for item in assessments if item.score is not None]
+        quality = DataQuality.GOOD if all(item.quality == DataQuality.GOOD for item in assessments) else DataQuality.PARTIAL
+        result = RideAssessment(
+            "unknown" if quality != DataQuality.GOOD else ("good" if all(item.status == "good" for item in assessments) else "bad"),
+            min(scores) if scores else None,
+            quality,
+            tuple(dict.fromkeys(source for item in assessments for source in item.source_ids)),
+            tuple(dict.fromkeys(reason for item in assessments for reason in item.reasons)),
+        )
+    def average(field):
+        values = [getattr(item, field) for item in relevant if getattr(item, field) is not None]
+        return sum(values) / len(values) if values else None
+    def maximum(field):
+        values = [getattr(item, field) for item in relevant if getattr(item, field) is not None]
+        return max(values) if values else None
+    def minimum(field):
+        values = [getattr(item, field) for item in relevant if getattr(item, field) is not None]
+        return min(values) if values else None
+    retrieved = [item.retrieved_at for item in relevant]
+    return RideWindowAssessment(
+        start_at, end_at, result, coverage if relevant else None, len(relevant),
+        average("temperature_c"), minimum("temperature_c"), average("wind_kmh"), maximum("wind_kmh"),
+        maximum("gust_kmh"), maximum("precipitation_mm"),
+        maximum("precipitation_probability_pct"), max(retrieved) if retrieved else None,
+    )
+
+
+__all__ = ["DataQuality", "ForecastSlot", "RideAssessment", "RideProfile", "RideWindowAssessment", "WeatherObservation", "WeatherSource", "assess_classic", "assess_ride_window", "assess_score", "choose_metric_observations", "from_ha_forecast", "from_ha_weather_state", "from_openweather", "normalize_rain_rate_mmh", "normalize_temperature_c", "normalize_wind_kmh"]

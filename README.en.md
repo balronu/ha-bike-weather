@@ -4,8 +4,8 @@
 
 [🇩🇪 Deutsch](README.md) | 🇬🇧 **English**
 
-> **Published: `v0.1.0-beta.7` – not a stable release.** HACS installation
-> and practical testing are performed only by the user.
+> **Development target: `v0.2.0-beta.1` – not released yet.** HACS
+> installation and practical testing are performed only by the user.
 
 ## Overview
 
@@ -18,6 +18,16 @@ Temperature, wind and rain are selected independently with freshness checks:
 3. unknown when no trustworthy value is available.
 
 Missing and invalid values are never silently treated as zero.
+
+## Phase 10A: Spontaneous bike ride
+
+The card now includes a **Spontaneous bike ride** section. Departure is a
+date/time in Home Assistant's timezone and duration is selectable as 15, 30,
+45, 60, 90 or 120 minutes. The backend evaluates every touched hourly
+forecast interval with the shared Python score logic; gaps produce unknown or
+limited quality and the frontend never calculates a second score. Inputs are
+debounced and restored per card/integration from browser `localStorage` when
+available. Existing card configurations remain compatible.
 
 ## Beta 7 features
 
@@ -41,7 +51,7 @@ Home Assistant 2026.10.x or newer and HACS are required.
 
 1. Open Custom repositories in HACS.
 2. Add balronu/ha-bike-weather as an Integration repository.
-3. Enable beta versions and select the published `v0.1.0-beta.7` release.
+3. Enable beta versions and select the desired published release.
 4. Restart Home Assistant when requested after download.
 5. Add Bike Weather under Settings → Devices & services.
 
@@ -71,14 +81,16 @@ ride-window and duration values when opened and saved.
 type: custom:bike-weather-card
 show_forecast: true
 show_details: true
-ride_start: "07:30"
+ride_start: "15:00"
 ride_duration_minutes: 60
 ~~~
 
 The card shows the score, assessment, temperature, wind, rain rate, forecast,
-ride window, duration, source and data quality. Missing or stale data is
-explicitly visible. The integration is detected automatically; the visual editor changes entry_id, forecast/details,
-start time and duration.
+ride window, duration, source and data quality. The spontaneous ride also
+shows departure, arrival, score, assessment, temperature, wind, gusts, rain,
+rain probability, coverage and data-derived reasons. Missing or stale data is
+explicitly visible. The integration is detected automatically; the visual
+editor changes entry_id, forecast/details, start time and duration.
 
 ## Score and limitations
 
@@ -110,6 +122,7 @@ Hassfest, HACS validation and Gitleaks run through GitHub Actions.
 - [Installation](docs/INSTALLATION.md)
 - [Branding](BRANDING.md)
 - [Beta 7 release notes](docs/releases/v0.1.0-beta.7.md)
+- [Phase 10A implementation report](docs/PHASE10A-SPONTANEOUS-RIDE.md)
 
 ## License
 

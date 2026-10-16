@@ -7,8 +7,19 @@ als große Sensorattribute gespeichert. Status, Score, aktuelle Messwerte,
 Quelle, Qualität und Fehlerzustände sind textlich sichtbar.
 
 Konfiguration: optionale entry_id, show_forecast, show_details, ride_start und
-ride_duration_minutes. Die Zeitleiste zeigt ausschließlich bereits im
-Coordinator bewertete Forecast-Slots; das Frontend berechnet keinen Score.
+ride_duration_minutes. `ride_start` bleibt als kompatibler Zeit-Default
+erhalten; die spontane Fahrt erfasst in der Karte zusätzlich das konkrete
+Datum. Zulässige Dauern sind 15, 30, 45, 60, 90 und 120 Minuten. Änderungen
+werden entprellt an den read-only Befehl `bike_weather/spontaneous_ride`
+gesendet. Die Zeitleiste und die spontane Fahrt verwenden ausschließlich
+Backend-Bewertungen; das Frontend berechnet keinen Score.
+
+Die Eingaben werden pro Karte/Integration im Browser-`localStorage` gesichert.
+`spontaneous_ride_storage_key` kann für zwei Karten mit derselben Integration
+explizit unterschiedlich gesetzt werden. Ohne diesen Schlüssel wird die
+stabile Kartenposition im Dashboard einbezogen; beim dauerhaften Umsortieren
+kann dadurch ein neuer lokaler Speicher entstehen. Ohne Browser-Speicher
+funktioniert die Bewertung weiter, aber ohne Wiederherstellung.
 
 Ohne `entry_id` fragt die Karte über den authentifizierten read-only
 WebSocket-Befehl `bike_weather/list_entries` die geladenen Bike-Weather-

@@ -36,4 +36,4 @@ Kacheln, Python-Zeitfenster-/DST-Regressionen sowie bestehende Python-,
 Frontend-, HACS-, Hassfest- und Gitleaks-Prüfungen wurden ausgeführt. Ein
 produktiver HA- oder Dashboard-Test wurde nicht durchgeführt.
 
-PR: wird auf einem separaten Phase-12B-Branch erstellt und bleibt offen.
+PR: https://github.com/balronu/ha-bike-weather/pull/12 (offen).

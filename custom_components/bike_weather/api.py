@@ -299,6 +299,8 @@ def _day_response(result, profile):
     codes = list(dict.fromkeys(result.assessment.reasons))
     if result.maximum_precipitation_mm is not None and result.maximum_precipitation_mm > profile.max_rain_mm:
         codes.append("rain_during_day")
+    if result.maximum_precipitation_probability_pct is not None and result.maximum_precipitation_probability_pct > profile.max_precipitation_probability_pct:
+        codes.append("rain_possible")
     if result.maximum_wind_kmh is not None and result.maximum_wind_kmh >= profile.max_wind_kmh:
         codes.append("wind_above_limit")
     return {"status": result.assessment.status, "assessment": result.assessment.status, "score": result.assessment.score, "quality": result.assessment.quality.value, "start_at": result.start_at.isoformat(), "end_at": result.end_at.isoformat(), "reason_codes": list(dict.fromkeys(codes)), "metrics": {"minimum_temperature_c": result.minimum_temperature_c, "maximum_temperature_c": result.maximum_temperature_c, "wind_kmh": result.average_wind_kmh, "maximum_wind_kmh": result.maximum_wind_kmh, "maximum_gust_kmh": result.maximum_gust_kmh, "precipitation_mm": result.maximum_precipitation_mm, "precipitation_probability_pct": result.maximum_precipitation_probability_pct}, "forecast_coverage": {"slot_count": result.slot_count, "covered_until": result.covered_until.isoformat() if result.covered_until else None, "complete": result.covered_until is not None and result.covered_until >= result.end_at}, "suitable_windows": [_window_response(item) for item in result.suitable_windows], "adverse_windows": [_window_response(item) for item in result.adverse_windows], "forecast_retrieved_at": result.forecast_retrieved_at.isoformat() if result.forecast_retrieved_at else None}

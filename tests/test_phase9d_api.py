@@ -135,6 +135,24 @@ class DiscoveryApiTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(api._ride_reasons(incomplete, profile)[0], ("forecast_coverage_incomplete",))
         self.assertEqual(api._ride_reasons(empty, profile)[0], ("forecast_unavailable",))
 
+    def test_complete_window_has_no_coverage_error_when_all_factors_exist(self):
+        end = datetime(2026, 10, 16, 15, tzinfo=UTC)
+        result = SimpleNamespace(
+            assessment=SimpleNamespace(quality=api.DataQuality.GOOD, reasons=("Alle Score-Faktoren vorhanden",), status="good"),
+            covered_until=end,
+            end_at=end,
+            slot_count=2,
+            maximum_precipitation_mm=0,
+            maximum_precipitation_probability_pct=0,
+            minimum_temperature_c=18,
+            maximum_wind_kmh=5,
+            maximum_gust_kmh=10,
+        )
+        profile = SimpleNamespace(max_rain_mm=0, max_precipitation_probability_pct=40, min_temperature_c=10, max_wind_kmh=15, max_gust_kmh=40)
+        codes, _ = api._ride_reasons(result, profile)
+        self.assertNotIn("forecast_coverage_incomplete", codes)
+        self.assertNotIn("forecast_unavailable", codes)
+
     def test_planned_ride_does_not_turn_unselected_day_into_score_zero(self):
         coordinator = SimpleNamespace(options={"ride_outbound_enabled": True, "ride_outbound_start": "07:30:00", "ride_outbound_weekdays": [0]})
         now = datetime(2026, 10, 16, 6, tzinfo=UTC)  # Friday

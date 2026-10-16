@@ -3,7 +3,7 @@
 Dies ist die kompatible deutsche README-Datei. Die vollständige deutsche
 Dokumentation steht in [README.md](README.md).
 
-Die geplante Beta-1 zu `v0.2.0` verbessert den Config Flow mit nativen
+Die aktuelle Vorabversion `v0.2.0-beta.2` verbessert den Config Flow mit nativen
 EntitySelectoren, erkennt eindeutige lokale Wetterstationssensoren,
 normalisiert °C/°F, km/h/m/s/mph und Regenraten, lokalisiert Provider und
 Options Flow und bringt eine responsive Karte mit visuellem Editor. Zusätzlich
@@ -18,5 +18,6 @@ Die Karte enthält zusätzlich **Spontane Fahrradtour** mit Datum/Uhrzeit,
 Bewertung über die bestehende Python-Logik und lokaler Wiederherstellung der
 Karteneingaben. Die vollständige deutsche Dokumentation steht in
 [README.md](README.md) und im [Phase-10A-Bericht](docs/PHASE10A-SPONTANEOUS-RIDE.md).
-Produktive HACS-Installation und Praxistest erfolgen ausschließlich durch den
-Nutzer.
+Beta 2 trennt zusätzlich vollständige Forecast-Abdeckung mit fehlenden
+Bewertungsfaktoren sauber von echten Forecast-Lücken. Produktive HACS-
+Installation und Praxistest erfolgen ausschließlich durch den Nutzer.

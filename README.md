@@ -4,8 +4,7 @@
 
 🇩🇪 **Deutsch** | [🇬🇧 English](README.en.md)
 
-> **Entwicklungsstand: `v0.2.0-beta.1` – noch nicht veröffentlicht.**
-> Installation und Praxistest über HACS erfolgen ausschließlich durch den Nutzer.
+> **Aktuelle Vorabversion: `v0.2.0-beta.2`.** Installation und Praxistest über HACS erfolgen ausschließlich durch den Nutzer.
 
 ## Überblick
 
@@ -20,7 +19,7 @@ Frischeprüfung priorisiert:
 
 Fehlende oder ungültige Werte werden nie stillschweigend als 0 behandelt.
 
-## Phase-10A-Funktion: Spontane Fahrradtour
+## Phase-10A/10C-Funktion: Spontane Fahrradtour
 
 Die Karte enthält den Abschnitt **Spontane Fahrradtour**. Abfahrt und Dauer
 (15, 30, 45, 60, 90 oder 120 Minuten) werden direkt in der Karte gewählt.
@@ -36,6 +35,12 @@ bei privaten Browsern oder gelöschtem Speicher funktioniert die Berechnung
 trotzdem, aber die Auswahl wird nicht wiederhergestellt. Für mehrere Karten
 mit derselben Integration kann `spontaneous_ride_storage_key` zur Trennung
 gesetzt werden.
+
+Bei vollständiger Forecast-Abdeckung, aber fehlenden einzelnen Bewertungsfaktoren,
+zeigt die Karte den Teilscore mit Datenqualität `eingeschränkt` und Status
+`unbekannt` sowie den konkret fehlenden Faktor. Das ist von einer zeitlichen
+Forecast-Lücke oder vollständig fehlenden Prognosedaten getrennt; stündliche
+Forecasts werden nicht künstlich auf Minuten interpoliert.
 
 ## Beta-7-Funktionen
 

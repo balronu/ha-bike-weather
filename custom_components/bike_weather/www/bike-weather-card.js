@@ -1,7 +1,7 @@
-/* Bike Weather card v0.2.0-beta.1. */
+/* Bike Weather card v0.2.0-beta.2. */
 (function () {
   "use strict";
-  const VERSION = "0.2.0-beta.1";
+  const VERSION = "0.2.0-beta.2";
   const LIST_ENTRIES = "bike_weather/list_entries";
   const CARD_DATA = "bike_weather/card_data";
   const RIDE_DATA = "bike_weather/spontaneous_ride";

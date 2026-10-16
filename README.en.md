@@ -4,7 +4,7 @@
 
 [🇩🇪 Deutsch](README.md) | 🇬🇧 **English**
 
-> **Development target: `v0.2.0-beta.1` – not released yet.** HACS
+> **Current prerelease: `v0.2.0-beta.2`.** HACS
 > installation and practical testing are performed only by the user.
 
 ## Overview
@@ -19,7 +19,7 @@ Temperature, wind and rain are selected independently with freshness checks:
 
 Missing and invalid values are never silently treated as zero.
 
-## Phase 10A: Spontaneous bike ride
+## Phase 10A/10C: Spontaneous bike ride
 
 The card now includes a **Spontaneous bike ride** section. Departure is a
 date/time in Home Assistant's timezone and duration is selectable as 15, 30,
@@ -28,6 +28,12 @@ forecast interval with the shared Python score logic; gaps produce unknown or
 limited quality and the frontend never calculates a second score. Inputs are
 debounced and restored per card/integration from browser `localStorage` when
 available. Existing card configurations remain compatible.
+
+When the forecast window is fully covered but individual scoring factors are
+missing, the card shows the partial score with limited data quality and an
+unknown suitability status, together with the missing factor. This is kept
+distinct from a temporal forecast gap or completely missing forecast data;
+hourly forecasts are never interpolated into false minute precision.
 
 ## Beta 7 features
 

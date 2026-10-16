@@ -1,9 +1,9 @@
-# Installation – v0.1.0-beta.7
+# Installation – v0.3.0 Stable
 
-Diese Version ist eine HACS-Vorabversion. Aktiviere in HACS die Option für
-Vorabversionen und füge `balronu/ha-bike-weather` als benutzerdefiniertes
-Repository der Kategorie **Integration** hinzu. Installiere anschließend den
-Beta-6-Release und starte Home Assistant nach Aufforderung neu.
+Die Stable-Version v0.3.0 ist die reguläre HACS-Installation. Füge
+`balronu/ha-bike-weather` als benutzerdefiniertes Repository der Kategorie
+**Integration** hinzu, wähle den Stable-Release und starte Home Assistant nach
+Aufforderung neu.
 
 Danach:
 
@@ -19,13 +19,12 @@ Die Integration registriert `/bike_weather/bike-weather-card.js` automatisch
 Eine manuelle Ressourcenregistrierung ist nicht erforderlich. Bestehende,
 andere Lovelace-Ressourcen bleiben unverändert.
 
-## Beta-Einschränkung
+## Einschränkung
 
-Die Offline- und Browserprüfungen sind erfolgreich. Die veröffentlichte Beta
-wurde jedoch nicht auf der produktiven VM 104 installiert und nicht mit
-produktiven Zugangsdaten getestet. Config-/Options-Flow, Coordinator,
-WebSocket und Kartenressource müssen vor einer produktiven Nutzung in der
-Zielumgebung geprüft werden.
+Die Offline-, Frontend- und HA-Fixture-Prüfungen sind erfolgreich. Ein echter
+Browser-/HA-E2E-Test gegen die produktive VM 104 wurde jedoch nicht
+durchgeführt. Die Stable-Version wurde nicht automatisch installiert und
+produktive Zugangsdaten wurden nicht verwendet.
 
 Die bestehende YAML-/REST-Lösung bleibt bis zum ausdrücklich freigegebenen
 Hot-Cutover unverändert. Es gibt keinen automatischen Import, keine Entfernung

@@ -2,177 +2,141 @@
 
 # Bike Weather – Fahrradwetter für Home Assistant
 
-🇩🇪 **Deutsch** | [🇬🇧 English](README.en.md)
+**Deutsch** | [English](README.en.md)
 
-> **Aktuelle Entwicklungsversion: `v0.3.0-beta.1`.** Phase 11A ergänzt regelmäßige Hin-/Rückfahrten und eine Morgenprognose. Installation und Praxistest über HACS erfolgen ausschließlich durch den Nutzer.
+[![Stable](https://img.shields.io/github/v/release/balronu/ha-bike-weather?sort=semver&label=Stable)](https://github.com/balronu/ha-bike-weather/releases/latest)
+[![CI](https://github.com/balronu/ha-bike-weather/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/balronu/ha-bike-weather/actions/workflows/ci.yml)
+[![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://www.hacs.xyz/)
+[![License](https://img.shields.io/github/license/balronu/ha-bike-weather)](LICENSE)
 
-## Überblick
+Bike Weather bewertet anhand lokaler Wetterdaten und verfügbarer Prognosen,
+wie gut sich das Wetter zum Fahrradfahren eignet. Die Bewertung von 0 bis 100
+bleibt nachvollziehbar: fehlende oder veraltete Werte werden als unbekannt
+beziehungsweise eingeschränkt dargestellt und nicht stillschweigend als gut
+behandelt.
 
-Bike Weather erzeugt aus einer Home-Assistant-Wetterentität, OpenWeatherMap
-und/oder einer lokalen Wetterstation einen nachvollziehbaren Fahrradwetter-
-Score von 0 bis 100. Temperatur, Wind und Regen werden pro Messgröße mit
-Frischeprüfung priorisiert:
+## Funktionen
 
-1. lokaler Wetterstationssensor, wenn aktiviert und gültig;
-2. konfigurierter Wetteranbieter;
-3. unbekannt, wenn keine belastbaren Daten vorliegen.
-
-Fehlende oder ungültige Werte werden nie stillschweigend als 0 behandelt.
-
-## Phase-10A/10C-Funktion: Spontane Fahrradtour
-
-Die Karte enthält den Abschnitt **Spontane Fahrradtour**. Abfahrt und Dauer
-(15, 30, 45, 60, 90 oder 120 Minuten) werden direkt in der Karte gewählt.
-Die Abfahrt wird als Datum und Uhrzeit in der Home-Assistant-Zeitzone erfasst;
-eine vergangene Zeit wird nicht stillschweigend auf den Folgetag verschoben.
-Das Backend bewertet alle berührten stündlichen Forecast-Intervalle mit der
-bestehenden Python-Scorelogik. Lücken führen zu `unbekannt` beziehungsweise
-eingeschränkter Datenqualität. Das Frontend berechnet keinen eigenen Score.
-
-Die letzte Auswahl wird je Karte und Integration im Browser-`localStorage`
-entprellt gespeichert. Bestehende Kartenkonfigurationen bleiben kompatibel;
-bei privaten Browsern oder gelöschtem Speicher funktioniert die Berechnung
-trotzdem, aber die Auswahl wird nicht wiederhergestellt. Für mehrere Karten
-mit derselben Integration kann `spontaneous_ride_storage_key` zur Trennung
-gesetzt werden.
-
-Bei vollständiger Forecast-Abdeckung, aber fehlenden einzelnen Bewertungsfaktoren,
-zeigt die Karte den Teilscore mit Datenqualität `eingeschränkt` und Status
-`unbekannt` sowie den konkret fehlenden Faktor. Das ist von einer zeitlichen
-Forecast-Lücke oder vollständig fehlenden Prognosedaten getrennt; stündliche
-Forecasts werden nicht künstlich auf Minuten interpoliert.
-
-## Funktionen der aktuellen Beta `v0.3.0-beta.1`
-
-- regelmäßige Hin- und Rückfahrten mit Wochentagen, Uhrzeiten und Dauer;
+- aktuelles Fahrradwetter mit Score, Status, Begründungen und Datenqualität;
+- Home-Assistant-Wetterprognosen sowie optionale lokale Wetterstation;
+- unabhängige Sensoren für Temperatur, Wind und Regenrate;
+- regelmäßige Hinfahrt und Rückfahrt mit individuellen Wochentagen, Uhrzeiten
+  und Fahrtdauern;
 - konservative Morgenprognose für 06:00–22:00;
-- gemeinsame Scorelogik für regelmäßige, morgige und spontane Fahrten;
-- klare Zustände für nicht geplante oder bereits vergangene Fahrten.
+- spontane Fahrradtour mit frei wählbarer Abfahrtszeit und 15–120 Minuten;
+- gemeinsame Python-Scorelogik für aktuelle Werte und Forecast-Zeitfenster;
+- transparente Trennung zwischen Forecast-Lücken und fehlenden Einzelwerten;
+- responsive Lovelace-Karte mit Editor und automatischer Integrationserkennung;
+- deutsche und englische Oberfläche.
 
-Die folgenden Funktionen aus der Beta-7-Linie bleiben ebenfalls enthalten:
+## Voraussetzungen
 
-- native EntitySelectoren statt freier Entity-ID-Eingabe;
-- eindeutige Vorauswahl kompatibler lokaler Sensoren;
-- unabhängige Sensoren für Außentemperatur, Windgeschwindigkeit und Regenrate;
-- Einheiten: °C/°F, km/h/m/s/mph sowie mm/h und in/h;
-- Provider-Auswahl mit verständlichen deutschen und englischen Beschriftungen;
-- Options Flow mit vorausgefüllten und verlustfrei gespeicherten Einstellungen;
-- responsive custom:bike-weather-card mit Editor, Score, Messwerten,
-  Datenquelle, Datenqualität, Fahrzeitfenster und Prognose;
-- neues Logo, README-Banner, Social Preview und konsistente Dokumentation.
-- vollständig abgesicherter Options Flow für Home Assistant 2026.10; bestehende
-  Beta-2- bis Beta-4-Konfigurationen mit leeren Optionswerten bleiben erhalten.
-- statische Lovelace-Kartenroute über die aktuelle HA-2026.10-API mit Legacy-Fallback;
-  die versionierte Ressource wird weiterhin automatisch und idempotent registriert.
+- Home Assistant 2026.10.x oder neuer;
+- HACS für die bevorzugte Installation;
+- mindestens eine weather.*-Entität für Forecast-Daten;
+- optional kompatible Sensoren für Außentemperatur, Windgeschwindigkeit und
+  Regenrate;
+- OpenWeatherMap ist optional und benötigt nur bei Auswahl dieses Providers
+  einen eigenen API-Schlüssel.
 
-## Voraussetzungen und Installation
+Echte produktive Browser-/HA-E2E-Tests und Screenshots sind nicht Bestandteil
+dieses Releases. Die automatisierten HA-Fixture-, Hassfest- und HACS-Prüfungen
+sind dokumentiert und laufen in GitHub Actions.
 
-Home Assistant 2026.10.x oder neuer und HACS werden vorausgesetzt.
+## Installation über HACS
 
-1. In HACS Benutzerdefinierte Repositories öffnen.
-2. balronu/ha-bike-weather als Repository-Typ Integration hinzufügen.
-3. Vorabversionen aktivieren und den gewünschten veröffentlichten Release auswählen.
-4. Nach dem Download Home Assistant nach Aufforderung neu starten.
-5. Einstellungen → Geräte & Dienste → Integration hinzufügen → Bike Weather.
+1. HACS → **Benutzerdefinierte Repositories** öffnen.
+2. balronu/ha-bike-weather als Repository-Typ **Integration** hinzufügen.
+3. Den veröffentlichten Stable-Release v0.3.0 auswählen.
+4. Home Assistant nach Aufforderung neu starten.
+5. Unter **Einstellungen → Geräte & Dienste** die Integration **Bike Weather**
+   hinzufügen.
 
-Eine manuelle Lovelace-Ressource ist nicht erforderlich. Die Karte wird
-idempotent als versionierte Ressource registriert. Unabhängige vorhandene
-Lovelace-Ressourcen werden nicht verändert.
+Die Stable-Version ist der reguläre Installationsweg; Vorabversionen werden
+nicht benötigt. Eine manuelle Lovelace-Ressource ist nicht erforderlich.
 
 ## Einrichtung
 
-### Wetteranbieter
+Im Config Flow wird eine Wetterdatenquelle ausgewählt. Danach können optional
+lokale Sensoren, Datenalter, Aktualisierungsintervall, Score-Grenze und die
+Fahrzeitoptionen konfiguriert werden. Der Options Flow übernimmt vorhandene
+Werte, sodass bestehende Konfigurationen erhalten bleiben.
 
-Der Provider kann sein:
+Die lokalen Sensoren werden unabhängig für Temperatur, Windgeschwindigkeit und
+Regenrate gewählt. Bei mehreren möglichen Kandidaten erfolgt keine riskante
+automatische Auswahl. Die Sensor-IDs sind installationsabhängig.
 
-- Home-Assistant-Wetterintegration: eine passende weather.*-Entität wird
-  über EntitySelector gewählt;
-- OpenWeatherMap: API-Schlüssel wird nur für diesen Provider benötigt;
-- Kein zusätzlicher Wetteranbieter: nur lokale Sensoren.
+## Regelmäßige Fahrten und Morgenprognose
 
-Beispiele wie weather.openweathermap oder weather.forecast_home sind nicht
-fest codiert.
+Hinfahrt und Rückfahrt sind unabhängig konfigurierbar. Für jede Fahrt können
+Wochentage, Uhrzeit und Dauer gesetzt werden, zum Beispiel Hinfahrt Montag bis
+Freitag um 07:30 für 30 Minuten und Rückfahrt Montag, Dienstag, Donnerstag und
+Freitag um 13:30 für 30 Minuten.
 
-### Lokale Wetterstation
+Die Morgenprognose betrachtet 06:00–22:00. Hohe Regenwahrscheinlichkeit,
+fehlende Niederschlagsmengen oder unvollständige Forecast-Abdeckung führen
+konservativ zu eingeschränkter beziehungsweise unbekannter Eignung. Positive
+Zeitfenster werden bei unvollständiger Abdeckung nicht vorgetäuscht.
 
-Aktiviere Lokale Wetterstationssensoren verwenden und wähle unabhängig:
+## Spontane Fahrradtour
 
-- Außentemperatur;
-- Windgeschwindigkeit;
-- Regenrate.
-
-Bei einer GW1100A können beispielsweise
-sensor.gw1100a_v2_2_3_outdoor_temperature,
-sensor.gw1100a_v2_2_3_wind_speed und
-sensor.gw1100a_v2_2_3_rain_rate verwendet werden. Diese IDs sind nur
-Beispiele. Andere kompatible Wetterstationen werden über Geräteeigenschaften
-und Einheiten unterstützt. Bei mehreren Kandidaten bleibt die Auswahl leer,
-damit keine falsche Entität automatisch gewählt wird.
-
-### Optionen nachträglich ändern
-
-Der Options Flow erhält bestehende Werte und erlaubt Provider, Entitäten,
-Datenalter, Aktualisierung, Score-Grenze, Fahrzeitfenster und Fahrtdauer zu
-ändern. Nicht bearbeitete Beta-2-Einstellungen bleiben erhalten.
+Die Karte bewertet alle berührten stündlichen Forecast-Intervalle einer frei
+gewählten Abfahrt und Dauer. Zeitlücken werden von vorhandenen Intervallen mit
+fehlenden Einzelwerten unterschieden. Bei vollständiger zeitlicher Abdeckung,
+aber fehlenden Bewertungsfaktoren, zeigt die Karte die eingeschränkte Qualität
+und den fehlenden Faktor. Das Frontend berechnet keinen eigenen Score.
 
 ## Lovelace-Karte
 
-~~~yaml
-type: custom:bike-weather-card
-show_forecast: true
-show_details: true
-ride_start: "15:00"
-ride_duration_minutes: 60
-~~~
+    type: custom:bike-weather-card
+    show_forecast: true
+    show_details: true
+    ride_start: "15:00"
+    ride_duration_minutes: 60
 
-Die Karte zeigt Score, Bewertung, Temperatur, Wind, Regenrate, Prognose,
-Fahrzeitfenster, Fahrtdauer, Datenquelle und Datenqualität. Die spontane Fahrt
-zeigt Abfahrt, Ankunft, Score, Bewertung, Temperatur, Wind, Böen, Regen,
-Regenwahrscheinlichkeit, Prognoseabdeckung und eine datenbasierte Begründung.
-Fehlende oder veraltete Daten werden ausdrücklich angezeigt. Der visuelle
-Karteneditor kann die erkannte Integration, Prognose/Details, Startzeit und
-Fahrtdauer ändern.
+Die Integration registriert die versionierte Karte idempotent. Vorhandene
+unabhängige Lovelace-Ressourcen werden nicht verändert.
 
-## Bewertung
+## Bewertung und Datenqualität
 
-Der Score ist ein konservativer gewichteter Wert zwischen 0 und 100. Er
-berücksichtigt Temperatur, Wind, Böen, Regen, Regenwahrscheinlichkeit und
-gefühlte Temperatur. Fehlende Faktoren reduzieren die Datenqualität; ein
-unvollständiger Datensatz wird nicht als uneingeschränkt gute Fahrt
-ausgegeben. Die tatsächlichen Standardwerte stehen im gebündelten Core und
-werden durch Tests abgesichert.
+Der Score berücksichtigt Temperatur, Wind, Böen, Regen,
+Regenwahrscheinlichkeit und gefühlte Temperatur. Die Bewertung ist ein
+gewichteter Wert von 0 bis 100. Fehlende oder veraltete Faktoren senken die
+Datenqualität; ein unvollständiger Datensatz wird nicht als uneingeschränkt
+geeignete Fahrt ausgegeben.
 
-## Datenschutz und Einschränkungen
+## Fehlerbehebung und Updates
 
-Lokale Sensoren und Home-Assistant-Wetterdaten bleiben lokal. OpenWeatherMap
-wird nur bei ausdrücklicher Auswahl und mit eigenem API-Schlüssel kontaktiert.
-`v0.3.0-beta.1` ist nicht als Stable freigegeben. Produktive HA-Installation,
-HACS-Update und Praxistest sind nicht Bestandteil dieses Branches.
+- Prüfe, ob die gewählte weather.*-Entität Forecast-Daten liefert.
+- Prüfe im Options Flow die ausgewählten Entitäten und deren Einheiten.
+- Nach einem HACS-Update Home Assistant neu starten, wenn HACS dies meldet.
+- Bei einer alten Kartenressource Browser-Cache und Lovelace-Ressourcen prüfen;
+  die aktuelle Version wird normalerweise automatisch registriert.
+- Für reproduzierbare Fehler bitte Logs, Home-Assistant-Version und die
+  Datenqualitätsbegründung ohne API-Schlüssel oder private Daten melden.
 
 ## Entwicklung und Tests
 
-~~~bash
-PYTHONPATH=. python3 -m pytest -q
-python3 -m unittest discover -s tests -p 'test_*.py'
-ruff check .
-mypy bike_weather_core
-python3 -m compileall -q bike_weather_core custom_components/bike_weather tests
-node --check custom_components/bike_weather/www/bike-weather-card.js
-~~~
+    PYTHONPATH=. python3 -m pytest -q
+    python3 -m unittest discover -s tests -p 'test_*.py'
+    ruff check .
+    mypy bike_weather_core
+    python3 -m compileall -q bike_weather_core custom_components/bike_weather tests
+    node --check custom_components/bike_weather/www/bike-weather-card.js
 
-Hassfest, HACS-Validierung und Gitleaks laufen zusätzlich über GitHub Actions.
-Echte Screenshots aus einer produktiven Home-Assistant-Installation sind in
-diesem Branch nicht enthalten; die Browser-/HA-Laufzeitprüfung bleibt offen.
+GitHub Actions führen zusätzlich Frontend-, HA-Fixture-, Hassfest-, HACS- und
+Gitleaks-Prüfungen aus.
 
-## Dateien und Branding
+## Dokumentation
 
-- [Englische README](README.en.md)
 - [Konfiguration](docs/CONFIGURATION.md)
 - [Karte](docs/CARD.md)
 - [Installation](docs/INSTALLATION.md)
-- [Branding-Hinweise](BRANDING.md)
-- [Phase-10A-Implementierungsbericht](docs/PHASE10A-SPONTANEOUS-RIDE.md)
+- [Wetterquellen](docs/WEATHER_SOURCES.md)
+- [Stable-Release Notes](docs/releases/v0.3.0.md)
 
-## Lizenz
+## Mitwirkung und Lizenz
 
-MIT, siehe [LICENSE](LICENSE).
+Fehlerberichte und Verbesserungen sind als GitHub Issue oder Pull Request
+willkommen. Bitte keine Zugangsdaten, privaten Entity-Attribute oder privaten
+Standortdaten veröffentlichen. Das Projekt steht unter der [MIT-Lizenz](LICENSE).

@@ -324,6 +324,22 @@ def assess_score(observation, profile=None):
     return RideAssessment(status, score, quality, (observation.source.source_id,), reasons, scores, used)
 
 
+def _critical_limit_reasons(observation, profile):
+    """Return known hard-limit breaches for conservative day windows."""
+    reasons = []
+    if observation.precipitation_mm is not None and observation.precipitation_mm > profile.max_rain_mm:
+        reasons.append("rain_during_day")
+    if observation.precipitation_probability_pct is not None and observation.precipitation_probability_pct > profile.max_precipitation_probability_pct:
+        reasons.append("rain_possible")
+    if observation.wind_kmh is not None and observation.wind_kmh >= profile.max_wind_kmh:
+        reasons.append("wind_above_limit")
+    if observation.gust_kmh is not None and observation.gust_kmh >= profile.max_gust_kmh:
+        reasons.append("gust_above_limit")
+    if observation.temperature_c is not None and observation.temperature_c < profile.min_temperature_c:
+        reasons.append("temperature_below_limit")
+    return tuple(reasons)
+
+
 def _slot_overlaps(slot, start, end):
     return slot.ends_at > start and slot.starts_at < end
 
@@ -414,8 +430,9 @@ def assess_day_forecast(slots, *, start_at, end_at, profile=None):
         quality = DataQuality.GOOD if all(item.quality == DataQuality.GOOD for item in assessments) else DataQuality.PARTIAL
         if coverage < end_at:
             quality = DataQuality.PARTIAL
+        critical_risk = any(_critical_limit_reasons(slot, profile) for slot in relevant)
         aggregate = RideAssessment(
-            "unknown" if quality != DataQuality.GOOD else ("good" if all(item.status == "good" for item in assessments) else "bad"),
+            "unknown" if quality != DataQuality.GOOD else ("bad" if critical_risk else ("good" if all(item.status == "good" for item in assessments) else "bad")),
             min(scores) if scores and coverage >= end_at else None,
             quality,
             tuple(dict.fromkeys(source for item in assessments for source in item.source_ids)),
@@ -429,7 +446,7 @@ def assess_day_forecast(slots, *, start_at, end_at, profile=None):
         groups = []
         current = None
         for slot, item in zip(relevant, assessments):
-            if not predicate(item):
+            if not predicate(slot, item):
                 if current:
                     groups.append(current)
                     current = None
@@ -445,8 +462,9 @@ def assess_day_forecast(slots, *, start_at, end_at, profile=None):
             groups.append(current)
         return tuple(ForecastWindow(begin, finish, status, score) for begin, finish, score in groups)
 
-    suitable = window_groups(lambda item: item.status == "good" and item.quality == DataQuality.GOOD, "good")
-    adverse = window_groups(lambda item: not (item.status == "good" and item.quality == DataQuality.GOOD), "adverse")
+    covered_safely = coverage >= end_at
+    suitable = window_groups(lambda slot, item: covered_safely and item.status == "good" and item.quality == DataQuality.GOOD and not _critical_limit_reasons(slot, profile), "good")
+    adverse = window_groups(lambda slot, item: not (covered_safely and item.status == "good" and item.quality == DataQuality.GOOD and not _critical_limit_reasons(slot, profile)), "adverse")
     return DayForecastAssessment(
         start_at, end_at, aggregate, coverage if relevant else None, len(relevant), suitable, adverse,
         min(values("temperature_c")) if values("temperature_c") else None,

@@ -43,11 +43,14 @@ const makeHass = (entries) => {
 {
   const {hass, calls} = makeHass([{entry_id: "one", title: "Garden", state: "loaded", available: true}]);
   const card = new (customElements.get("bike-weather-card"))();
-  card.setConfig({});
+  card.setConfig({ride_datetime: "2026-10-16T13:30"});
   card.hass = hass;
   await wait();
   assert.deepEqual(calls.map((item) => item.type), ["bike_weather/list_entries", "bike_weather/card_data", "bike_weather/planning_data", "bike_weather/spontaneous_ride"]);
+  assert.equal(calls[3].start_at, "2026-10-16T13:30");
   assert.match(card.shadowRoot.innerHTML, /88/);
+  assert.doesNotMatch(card.shadowRoot.innerHTML, /class="forecast"/);
+  assert.doesNotMatch(card.shadowRoot.innerHTML, /Ride window:/);
 }
 
 {

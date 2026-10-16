@@ -44,6 +44,17 @@ def test_partial_day_coverage_is_unknown_even_when_available_slots_score_good():
     assert result.assessment.status == "unknown"
     assert result.assessment.score is None
     assert result.assessment.quality is core.DataQuality.PARTIAL
+    assert not result.suitable_windows
+    assert result.adverse_windows
+
+
+def test_high_rain_probability_is_not_presented_as_suitable():
+    start = datetime(2026, 10, 17, 6, tzinfo=UTC)
+    result = core.assess_day_forecast([slot(start, probability=90)], start_at=start, end_at=start + timedelta(hours=1))
+    assert result.assessment.status == "bad"
+    assert result.assessment.score is not None
+    assert not result.suitable_windows
+    assert result.adverse_windows[0].status == "adverse"
 
 
 def test_missing_factor_keeps_score_but_marks_day_quality_partial():
@@ -54,3 +65,12 @@ def test_missing_factor_keeps_score_but_marks_day_quality_partial():
     assert result.assessment.score == 80
     assert result.assessment.status == "unknown"
     assert result.assessment.quality is core.DataQuality.PARTIAL
+
+
+def test_no_forecast_slots_is_unavailable_not_a_bad_weather_score():
+    start = datetime(2026, 10, 17, 6, tzinfo=UTC)
+    result = core.assess_day_forecast([], start_at=start, end_at=start + timedelta(hours=1))
+    assert result.assessment.status == "unknown"
+    assert result.assessment.score is None
+    assert result.assessment.quality is core.DataQuality.UNAVAILABLE
+    assert result.assessment.reasons == ("forecast_unavailable",)

@@ -1,6 +1,6 @@
-# Installation – v0.3.0 Stable
+# Installation – v0.3.1 Stable
 
-Die Stable-Version v0.3.0 ist die reguläre HACS-Installation. Füge
+Die Stable-Version v0.3.1 ist die reguläre HACS-Installation. Füge
 `balronu/ha-bike-weather` als benutzerdefiniertes Repository der Kategorie
 **Integration** hinzu, wähle den Stable-Release und starte Home Assistant nach
 Aufforderung neu.

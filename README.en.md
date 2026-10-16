@@ -9,9 +9,8 @@
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://www.hacs.xyz/)
 [![License](https://img.shields.io/github/license/balronu/ha-bike-weather)](LICENSE)
 
-The Stable release is v0.3.0. This branch contains the v0.3.1 hotfix
-candidate, which removes the obsolete general forecast rendering from the
-card completely.
+The current Stable release is v0.3.1. This hotfix removes the obsolete
+general forecast rendering from the card completely.
 
 Bike Weather evaluates how suitable the weather is for cycling using local
 weather data and available forecasts. Scores from 0 to 100 remain explainable:
@@ -48,7 +47,7 @@ and run in GitHub Actions.
 
 1. Open **Custom repositories** in HACS.
 2. Add balronu/ha-bike-weather as an **Integration** repository.
-3. Select the published Stable release v0.3.0.
+3. Select the published Stable release v0.3.1.
 4. Restart Home Assistant when requested.
 5. Add **Bike Weather** under **Settings → Devices & services**.
 
@@ -132,7 +131,7 @@ Gitleaks checks.
 - [Card](docs/CARD.md)
 - [Installation](docs/INSTALLATION.md)
 - [Weather sources](docs/WEATHER_SOURCES.md)
-- [Stable release notes](docs/releases/v0.3.0.md)
+- [Stable release notes](docs/releases/v0.3.1.md)
 
 ## Contributing and license
 

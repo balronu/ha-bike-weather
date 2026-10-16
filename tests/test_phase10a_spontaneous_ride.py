@@ -55,6 +55,35 @@ def test_complete_window_uses_worst_interval_and_aggregate_values():
     assert result.slot_count == 2
 
 
+def test_complete_window_with_missing_rain_keeps_partial_score_but_not_missing_forecast():
+    start = datetime(2026, 10, 16, 13, 30, tzinfo=UTC)
+    result = assess_ride_window(
+        [
+            slot(start - timedelta(minutes=30), rain=None),
+            slot(start + timedelta(minutes=30), rain=None),
+        ],
+        start_at=start,
+        duration=timedelta(hours=1),
+    )
+
+    assert result.covered_until is not None and result.covered_until >= result.end_at
+    assert result.assessment.score == 80
+    assert result.assessment.status == "unknown"
+    assert result.assessment.quality is DataQuality.PARTIAL
+    assert "rain" in result.assessment.reasons
+
+
+def test_complete_score_80_is_distinct_from_partial_score_80():
+    start = datetime(2026, 10, 16, 15, tzinfo=UTC)
+    result = assess_ride_window(
+        [slot(start, wind=40)], start_at=start, duration=timedelta(hours=1)
+    )
+
+    assert result.assessment.score == 80
+    assert result.assessment.quality is DataQuality.GOOD
+    assert result.assessment.status == "good"
+
+
 def test_partial_forecast_never_becomes_positive():
     start = datetime(2026, 10, 16, 15, tzinfo=UTC)
     result = assess_ride_window(

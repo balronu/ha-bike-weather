@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import unittest
+from datetime import UTC, datetime
 from types import SimpleNamespace
 
 from homeassistant.config_entries import ConfigEntryState
@@ -90,3 +91,46 @@ class DiscoveryApiTests(unittest.IsolatedAsyncioTestCase):
         )
         self.assertNotIn("api_key", repr(connection.results))
         self.assertNotIn("weather.secret", repr(connection.results))
+
+    def test_complete_partial_quality_reports_missing_factor_not_missing_forecast(self):
+        result = SimpleNamespace(
+            assessment=SimpleNamespace(
+                quality=api.DataQuality.PARTIAL,
+                reasons=("rain",),
+                status="unknown",
+            ),
+            covered_until=datetime(2026, 10, 16, 15, tzinfo=UTC),
+            end_at=datetime(2026, 10, 16, 15, tzinfo=UTC),
+            slot_count=2,
+            maximum_precipitation_mm=None,
+            maximum_precipitation_probability_pct=0,
+            minimum_temperature_c=12,
+            maximum_wind_kmh=5,
+            maximum_gust_kmh=18,
+        )
+
+        codes, reasons = api._ride_reasons(result, SimpleNamespace(max_rain_mm=0, max_precipitation_probability_pct=40, min_temperature_c=10, max_wind_kmh=15, max_gust_kmh=40))
+
+        self.assertEqual(codes, ("precipitation_unavailable",))
+        self.assertEqual(reasons, codes)
+
+    def test_empty_and_incomplete_windows_keep_coverage_reasons_distinct(self):
+        base = {
+            "assessment": SimpleNamespace(
+                quality=api.DataQuality.PARTIAL,
+                reasons=("forecast_coverage_incomplete",),
+                status="unknown",
+            ),
+            "end_at": datetime(2026, 10, 16, 15, tzinfo=UTC),
+            "maximum_precipitation_mm": None,
+            "maximum_precipitation_probability_pct": None,
+            "minimum_temperature_c": None,
+            "maximum_wind_kmh": None,
+            "maximum_gust_kmh": None,
+        }
+        profile = SimpleNamespace(max_rain_mm=0, max_precipitation_probability_pct=40, min_temperature_c=10, max_wind_kmh=15, max_gust_kmh=40)
+        incomplete = SimpleNamespace(**base, covered_until=datetime(2026, 10, 16, 14, tzinfo=UTC), slot_count=1)
+        empty = SimpleNamespace(**base, covered_until=None, slot_count=0)
+
+        self.assertEqual(api._ride_reasons(incomplete, profile)[0], ("forecast_coverage_incomplete",))
+        self.assertEqual(api._ride_reasons(empty, profile)[0], ("forecast_unavailable",))

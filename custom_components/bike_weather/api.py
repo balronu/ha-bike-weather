@@ -211,8 +211,32 @@ def _unavailable_ride(entry_id, start_at, duration, reason):
 
 def _ride_reasons(result, profile):
     codes = []
-    if result.assessment.quality != DataQuality.GOOD:
-        codes.append("forecast_coverage_incomplete" if result.covered_until and result.covered_until < result.end_at else "forecast_unavailable")
+    coverage_complete = result.covered_until is not None and result.covered_until >= result.end_at
+    if not coverage_complete:
+        codes.append(
+            "forecast_coverage_incomplete"
+            if result.slot_count > 0 and result.covered_until is not None
+            else "forecast_unavailable"
+        )
+    elif result.assessment.quality != DataQuality.GOOD:
+        # A complete forecast window can still lack individual factors.  Do
+        # not describe that as missing forecast data: the score is available,
+        # but its suitability status remains unknown by design.
+        missing_reasons = {
+            "temperature": "temperature_unavailable",
+            "feels_like": "feels_like_unavailable",
+            "wind": "wind_unavailable",
+            "gust": "gust_unavailable",
+            "rain": "precipitation_unavailable",
+            "probability": "precipitation_probability_unavailable",
+        }
+        codes.extend(
+            missing_reasons[reason]
+            for reason in result.assessment.reasons
+            if reason in missing_reasons
+        )
+        if not any(code in missing_reasons.values() for code in codes):
+            codes.append("score_data_incomplete")
     if result.maximum_precipitation_mm is not None and result.maximum_precipitation_mm > profile.max_rain_mm:
         codes.append("rain_during_ride")
     if result.maximum_precipitation_probability_pct is not None and result.maximum_precipitation_probability_pct > profile.max_precipitation_probability_pct:

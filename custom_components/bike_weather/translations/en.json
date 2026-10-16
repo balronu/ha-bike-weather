@@ -43,7 +43,17 @@
           "max_rain_mm": "Rain tolerance (mm/h)",
           "min_score": "Minimum good score",
           "ride_start": "Ride-window start (HH:MM)",
-          "ride_duration_minutes": "Ride duration (minutes)"
+          "ride_duration_minutes": "Ride duration (minutes)",
+          "ride_outbound_enabled": "Enable outbound ride",
+          "ride_outbound_name": "Outbound ride name",
+          "ride_outbound_start": "Outbound departure time",
+          "ride_outbound_duration_minutes": "Outbound duration",
+          "ride_outbound_weekdays": "Outbound weekdays",
+          "ride_return_enabled": "Enable return ride",
+          "ride_return_name": "Return ride name",
+          "ride_return_start": "Return departure time",
+          "ride_return_duration_minutes": "Return duration",
+          "ride_return_weekdays": "Return weekdays"
         }
       }
     }

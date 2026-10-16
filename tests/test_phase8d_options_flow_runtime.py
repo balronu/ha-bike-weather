@@ -77,6 +77,7 @@ def _install_home_assistant_stubs(monkeypatch):
     selector.SelectSelector = _Selector
     selector.SelectSelectorConfig = _SelectorConfig
     selector.SelectSelectorMode = SimpleNamespace(DROPDOWN="dropdown")
+    selector.TimeSelector = lambda: _Selector(_SelectorConfig())
 
     helpers = types.ModuleType("homeassistant.helpers")
     helpers.__path__ = []

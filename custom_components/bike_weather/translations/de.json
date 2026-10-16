@@ -43,7 +43,17 @@
           "max_rain_mm": "Regentoleranz (mm/h)",
           "min_score": "Mindestscore für gut",
           "ride_start": "Start des Fahrzeitfensters (HH:MM)",
-          "ride_duration_minutes": "Fahrtdauer (Minuten)"
+          "ride_duration_minutes": "Fahrtdauer (Minuten)",
+          "ride_outbound_enabled": "Hinfahrt aktivieren",
+          "ride_outbound_name": "Name der Hinfahrt",
+          "ride_outbound_start": "Abfahrtszeit Hinfahrt",
+          "ride_outbound_duration_minutes": "Dauer Hinfahrt",
+          "ride_outbound_weekdays": "Wochentage Hinfahrt",
+          "ride_return_enabled": "Rückfahrt aktivieren",
+          "ride_return_name": "Name der Rückfahrt",
+          "ride_return_start": "Abfahrtszeit Rückfahrt",
+          "ride_return_duration_minutes": "Dauer Rückfahrt",
+          "ride_return_weekdays": "Wochentage Rückfahrt"
         }
       }
     }

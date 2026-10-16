@@ -46,7 +46,7 @@ class DiscoveryApiTests(unittest.IsolatedAsyncioTestCase):
         finally:
             api.websocket_api.async_register_command = original
 
-        self.assertEqual(registered, ["_card_data", "_list_entries", "_spontaneous_ride"])
+        self.assertEqual(registered, ["_card_data", "_list_entries", "_spontaneous_ride", "_planning_data"])
 
     async def test_list_entries_returns_only_non_secret_discovery_fields(self):
         hass = _Hass(
@@ -134,3 +134,17 @@ class DiscoveryApiTests(unittest.IsolatedAsyncioTestCase):
 
         self.assertEqual(api._ride_reasons(incomplete, profile)[0], ("forecast_coverage_incomplete",))
         self.assertEqual(api._ride_reasons(empty, profile)[0], ("forecast_unavailable",))
+
+    def test_planned_ride_does_not_turn_unselected_day_into_score_zero(self):
+        coordinator = SimpleNamespace(options={"ride_outbound_enabled": True, "ride_outbound_start": "07:30:00", "ride_outbound_weekdays": [0]})
+        now = datetime(2026, 10, 16, 6, tzinfo=UTC)  # Friday
+        result = api._planned_ride(coordinator, (), now, "outbound", "ride_outbound", SimpleNamespace())
+        self.assertEqual(result["status"], "not_planned_today")
+        self.assertIsNone(result["score"])
+
+    def test_planned_ride_marks_today_past_without_shifting_to_tomorrow(self):
+        coordinator = SimpleNamespace(options={"ride_outbound_enabled": True, "ride_outbound_start": "07:30:00", "ride_outbound_weekdays": [4]})
+        now = datetime(2026, 10, 16, 8, tzinfo=UTC)  # Friday
+        result = api._planned_ride(coordinator, (), now, "outbound", "ride_outbound", SimpleNamespace())
+        self.assertEqual(result["status"], "past")
+        self.assertTrue(result["start_at"].startswith("2026-10-16T07:30"))

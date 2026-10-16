@@ -4,7 +4,7 @@
 
 [🇩🇪 Deutsch](README.md) | 🇬🇧 **English**
 
-> **Current prerelease: `v0.2.0-beta.2`.** HACS
+> **Current development target: `v0.3.0-beta.1`.** Phase 11A adds independent regular rides and a conservative tomorrow forecast while preserving the spontaneous ride. HACS
 > installation and practical testing are performed only by the user.
 
 ## Overview

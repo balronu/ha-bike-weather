@@ -32,16 +32,22 @@ vm.runInThisContext(fs.readFileSync("custom_components/bike_weather/www/bike-wea
 const cardSource = fs.readFileSync("custom_components/bike_weather/www/bike-weather-card.js", "utf8");
 assert.match(cardSource, /spontaneous_ride_storage_key/);
 assert.match(cardSource, /_dashboardInstanceKey/);
+assert.doesNotMatch(cardSource, /class="forecast"/);
+assert.doesNotMatch(cardSource, /const forecast/);
 
 const data = {assessment: "good", score: 88, quality: "good", sources: ["ha_weather"], errors: [], current: {temperature_c: 18, wind_kmh: 4, precipitation_mm: 0}, forecast: []};
 const wait = () => new Promise((resolve) => setTimeout(resolve, 0));
-const makeHass = (entries) => {
+const makeHass = (entries, payload = {}) => {
   const calls = [];
-  return {hass: {connection: {}, locale: {language: "en"}, callWS: async (message) => { calls.push(message); return message.type === "bike_weather/list_entries" ? {entries} : data; }}, calls};
+  return {hass: {connection: {}, locale: {language: "en"}, callWS: async (message) => { calls.push(message); return message.type === "bike_weather/list_entries" ? {entries} : payload[message.type] || data; }}, calls};
 };
 
 {
-  const {hass, calls} = makeHass([{entry_id: "one", title: "Garden", state: "loaded", available: true}]);
+  const planning = {rides: {outbound: {name: "Outbound", status: "good", score: 80, start_time: "07:30", duration_minutes: 30, metrics: {temperature_c: 18, wind_kmh: 4, maximum_gust_kmh: 8}}, return: {name: "Return", status: "good", score: 75, start_time: "13:30", duration_minutes: 30, metrics: {temperature_c: 20, wind_kmh: 5, maximum_gust_kmh: 9}}}, tomorrow: {date: "2026-10-17", status: "good", score: 82, quality: "good", metrics: {minimum_temperature_c: 12, maximum_temperature_c: 20, maximum_wind_kmh: 10, precipitation_probability_pct: 10}, suitable_windows: [], adverse_windows: []}};
+  const ride = {status: "good", score: 84, quality: "good", start_at: "2026-10-16T13:30:00Z", end_at: "2026-10-16T14:30:00Z", forecast_coverage: {complete: true}, metrics: {temperature_c: 18, wind_kmh: 4, maximum_gust_kmh: 8, precipitation_mm: 0, precipitation_probability_pct: 10}, reason_codes: ["good_conditions"]};
+  const populatedData = {...data, forecast: [{datetime: "2026-10-16T13:00:00Z", score: 80, status: "good"}, {datetime: "2026-10-16T14:00:00Z", score: 81, status: "good"}]};
+  const {hass, calls} = makeHass([{entry_id: "one", title: "Garden", state: "loaded", available: true}], {"bike_weather/card_data": populatedData, "bike_weather/planning_data": planning, "bike_weather/spontaneous_ride": ride});
+  hass.locale.language = "de";
   const card = new (customElements.get("bike-weather-card"))();
   card.setConfig({ride_datetime: "2026-10-16T13:30"});
   card.hass = hass;
@@ -50,6 +56,12 @@ const makeHass = (entries) => {
   assert.equal(calls[3].start_at, "2026-10-16T13:30");
   assert.match(card.shadowRoot.innerHTML, /88/);
   assert.doesNotMatch(card.shadowRoot.innerHTML, /class="forecast"/);
+  assert.doesNotMatch(card.shadowRoot.innerHTML, /class="slot"/);
+  assert.ok(card.shadowRoot.innerHTML.includes("Heute – Meine Fahrten"));
+  assert.ok(card.shadowRoot.innerHTML.includes("Morgen – Fahrradwetter"));
+  assert.ok(card.shadowRoot.innerHTML.includes("Spontane Fahrradtour"));
+  assert.ok(card.shadowRoot.innerHTML.indexOf("Heute – Meine Fahrten") < card.shadowRoot.innerHTML.indexOf("Morgen – Fahrradwetter"));
+  assert.ok(card.shadowRoot.innerHTML.indexOf("Morgen – Fahrradwetter") < card.shadowRoot.innerHTML.indexOf("Spontane Fahrradtour"));
   assert.doesNotMatch(card.shadowRoot.innerHTML, /Ride window:/);
 }
 

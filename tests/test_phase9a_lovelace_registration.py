@@ -22,17 +22,17 @@ def test_card_bundle_contract_remains_idempotent_and_versioned():
     source = CARD.read_text()
 
     assert 'customElements.get("bike-weather-card")' in source
-    assert 'customElements.define("bike-weather-card", BikeWeatherCard)' in source
+    assert 'customElements.define("bike-weather-card",BikeWeatherCard)' in source
     assert 'customElements.get("bike-weather-card-editor")' in source
     assert 'window.BIKE_WEATHER_CARD_VERSION = VERSION' in source
-    assert 'const VERSION = "0.3.0"' in source
+    assert 'const VERSION = "0.3.1"' in source
 
 
 def test_card_editor_initializes_before_hass_or_set_config():
     source = CARD.read_text()
 
     assert "constructor() { super(); this.config =" in source
-    assert "...(config || {})" in source
+    assert "Object.assign({},DEFAULT_CONFIG,config || {})" in source
     assert "if (!this.config) return;" in source
 
 

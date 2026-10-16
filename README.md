@@ -4,7 +4,7 @@
 
 🇩🇪 **Deutsch** | [🇬🇧 English](README.en.md)
 
-> **Veröffentlicht: `v0.1.0-beta.7` – nicht als Stable-Version verwenden.**
+> **Entwicklungsstand: `v0.2.0-beta.1` – noch nicht veröffentlicht.**
 > Installation und Praxistest über HACS erfolgen ausschließlich durch den Nutzer.
 
 ## Überblick
@@ -19,6 +19,23 @@ Frischeprüfung priorisiert:
 3. unbekannt, wenn keine belastbaren Daten vorliegen.
 
 Fehlende oder ungültige Werte werden nie stillschweigend als 0 behandelt.
+
+## Phase-10A-Funktion: Spontane Fahrradtour
+
+Die Karte enthält den Abschnitt **Spontane Fahrradtour**. Abfahrt und Dauer
+(15, 30, 45, 60, 90 oder 120 Minuten) werden direkt in der Karte gewählt.
+Die Abfahrt wird als Datum und Uhrzeit in der Home-Assistant-Zeitzone erfasst;
+eine vergangene Zeit wird nicht stillschweigend auf den Folgetag verschoben.
+Das Backend bewertet alle berührten stündlichen Forecast-Intervalle mit der
+bestehenden Python-Scorelogik. Lücken führen zu `unbekannt` beziehungsweise
+eingeschränkter Datenqualität. Das Frontend berechnet keinen eigenen Score.
+
+Die letzte Auswahl wird je Karte und Integration im Browser-`localStorage`
+entprellt gespeichert. Bestehende Kartenkonfigurationen bleiben kompatibel;
+bei privaten Browsern oder gelöschtem Speicher funktioniert die Berechnung
+trotzdem, aber die Auswahl wird nicht wiederhergestellt. Für mehrere Karten
+mit derselben Integration kann `spontaneous_ride_storage_key` zur Trennung
+gesetzt werden.
 
 ## Beta-7-Funktionen
 
@@ -42,7 +59,7 @@ Home Assistant 2026.10.x oder neuer und HACS werden vorausgesetzt.
 
 1. In HACS Benutzerdefinierte Repositories öffnen.
 2. balronu/ha-bike-weather als Repository-Typ Integration hinzufügen.
-3. Vorabversionen aktivieren und den veröffentlichten Release `v0.1.0-beta.7` auswählen.
+3. Vorabversionen aktivieren und den gewünschten veröffentlichten Release auswählen.
 4. Nach dem Download Home Assistant nach Aufforderung neu starten.
 5. Einstellungen → Geräte & Dienste → Integration hinzufügen → Bike Weather.
 
@@ -92,14 +109,17 @@ Datenalter, Aktualisierung, Score-Grenze, Fahrzeitfenster und Fahrtdauer zu
 type: custom:bike-weather-card
 show_forecast: true
 show_details: true
-ride_start: "07:30"
+ride_start: "15:00"
 ride_duration_minutes: 60
 ~~~
 
 Die Karte zeigt Score, Bewertung, Temperatur, Wind, Regenrate, Prognose,
-Fahrzeitfenster, Fahrtdauer, Datenquelle und Datenqualität. Fehlende oder
-veraltete Daten werden ausdrücklich angezeigt. Der visuelle Karteneditor
-kann die erkannte Integration, Prognose/Details, Startzeit und Fahrtdauer ändern.
+Fahrzeitfenster, Fahrtdauer, Datenquelle und Datenqualität. Die spontane Fahrt
+zeigt Abfahrt, Ankunft, Score, Bewertung, Temperatur, Wind, Böen, Regen,
+Regenwahrscheinlichkeit, Prognoseabdeckung und eine datenbasierte Begründung.
+Fehlende oder veraltete Daten werden ausdrücklich angezeigt. Der visuelle
+Karteneditor kann die erkannte Integration, Prognose/Details, Startzeit und
+Fahrtdauer ändern.
 
 ## Bewertung
 
@@ -139,7 +159,7 @@ diesem Branch nicht enthalten; die Browser-/HA-Laufzeitprüfung bleibt offen.
 - [Karte](docs/CARD.md)
 - [Installation](docs/INSTALLATION.md)
 - [Branding-Hinweise](BRANDING.md)
-- [Beta-7-Release Notes](docs/releases/v0.1.0-beta.7.md)
+- [Phase-10A-Implementierungsbericht](docs/PHASE10A-SPONTANEOUS-RIDE.md)
 
 ## Lizenz
 

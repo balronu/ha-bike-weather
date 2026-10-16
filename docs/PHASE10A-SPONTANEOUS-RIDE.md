@@ -58,7 +58,7 @@ für den PR vorgesehen. Die genaue CI-Matrix wird nach dem Push ergänzt.
 
 ## PR und Einschränkungen
 
-PR: wird nach lokaler Prüfung auf dem Feature-Branch erstellt.
+PR: https://github.com/balronu/ha-bike-weather/pull/9 (offen, nicht gemergt).
 
 Die Vorhersage bleibt stündlich und darf keine Minutengenauigkeit vortäuschen.
 Die Browser-Persistenz ist nicht synchronisiert zwischen Geräten. Keine

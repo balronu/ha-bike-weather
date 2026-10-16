@@ -58,4 +58,4 @@ die tatsächlichen Nutzerzeiten im Options-Flow setzen. Für Phase 11B bietet
 sich eine konfigurierbare Tageszeitspanne sowie ein echter HA-Browser-E2E-Test
 an.
 
-PR: wird nach dem Push dieser Phase erstellt und bleibt bewusst offen.
+PR: https://github.com/balronu/ha-bike-weather/pull/11 (bewusst offen).

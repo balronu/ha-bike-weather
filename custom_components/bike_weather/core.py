@@ -111,6 +111,37 @@ class RideWindowAssessment:
     forecast_retrieved_at: datetime | None = None
 
 
+@dataclass(frozen=True, slots=True)
+class ForecastWindow:
+    """A contiguous, actually covered period in a day forecast."""
+
+    start_at: datetime
+    end_at: datetime
+    status: str
+    score: int | None
+
+
+@dataclass(frozen=True, slots=True)
+class DayForecastAssessment:
+    """Conservative aggregate for a configured daytime forecast period."""
+
+    start_at: datetime
+    end_at: datetime
+    assessment: RideAssessment
+    covered_until: datetime | None
+    slot_count: int
+    suitable_windows: tuple[ForecastWindow, ...] = ()
+    adverse_windows: tuple[ForecastWindow, ...] = ()
+    minimum_temperature_c: float | None = None
+    maximum_temperature_c: float | None = None
+    average_wind_kmh: float | None = None
+    maximum_wind_kmh: float | None = None
+    maximum_gust_kmh: float | None = None
+    maximum_precipitation_mm: float | None = None
+    maximum_precipitation_probability_pct: float | None = None
+    forecast_retrieved_at: datetime | None = None
+
+
 def _number(value: Any) -> float | None:
     if value is None or isinstance(value, bool):
         return None
@@ -360,4 +391,73 @@ def assess_ride_window(slots, *, start_at, duration, profile=None):
     )
 
 
-__all__ = ["DataQuality", "ForecastSlot", "RideAssessment", "RideProfile", "RideWindowAssessment", "WeatherObservation", "WeatherSource", "assess_classic", "assess_ride_window", "assess_score", "choose_metric_observations", "from_ha_forecast", "from_ha_weather_state", "from_openweather", "normalize_rain_rate_mmh", "normalize_temperature_c", "normalize_wind_kmh"]
+def assess_day_forecast(slots, *, start_at, end_at, profile=None):
+    """Assess a daytime period from real slots and group its actual windows.
+
+    The aggregate is the conservative minimum of the per-slot shared scores.
+    Missing coverage or score factors therefore cannot become an optimistic
+    day recommendation.  Window boundaries are never interpolated.
+    """
+    if start_at.tzinfo is None or end_at.tzinfo is None:
+        raise ValueError("forecast period must be timezone-aware")
+    if end_at <= start_at:
+        raise ValueError("forecast period must be positive")
+    ordered = tuple(sorted(slots, key=lambda item: item.starts_at))
+    relevant = tuple(item for item in ordered if _slot_overlaps(item, start_at, end_at))
+    profile = profile or RideProfile()
+    coverage = _coverage(relevant, start_at, end_at) if relevant else start_at
+    assessments = tuple(assess_score(item, profile) for item in relevant)
+    if not assessments:
+        aggregate = RideAssessment("unknown", None, DataQuality.UNAVAILABLE, (), ("forecast_unavailable",))
+    else:
+        scores = [item.score for item in assessments if item.score is not None]
+        quality = DataQuality.GOOD if all(item.quality == DataQuality.GOOD for item in assessments) else DataQuality.PARTIAL
+        if coverage < end_at:
+            quality = DataQuality.PARTIAL
+        aggregate = RideAssessment(
+            "unknown" if quality != DataQuality.GOOD else ("good" if all(item.status == "good" for item in assessments) else "bad"),
+            min(scores) if scores and coverage >= end_at else None,
+            quality,
+            tuple(dict.fromkeys(source for item in assessments for source in item.source_ids)),
+            tuple(dict.fromkeys(reason for item in assessments for reason in item.reasons)) or ("forecast_coverage_incomplete",),
+        )
+
+    def values(field):
+        return [getattr(item, field) for item in relevant if getattr(item, field) is not None]
+
+    def window_groups(predicate, status):
+        groups = []
+        current = None
+        for slot, item in zip(relevant, assessments):
+            if not predicate(item):
+                if current:
+                    groups.append(current)
+                    current = None
+                continue
+            score = item.score
+            if current and current[1] >= slot.starts_at:
+                current = (current[0], max(current[1], slot.ends_at), min(current[2], score) if score is not None and current[2] is not None else score)
+            else:
+                if current:
+                    groups.append(current)
+                current = (max(start_at, slot.starts_at), min(end_at, slot.ends_at), score)
+        if current:
+            groups.append(current)
+        return tuple(ForecastWindow(begin, finish, status, score) for begin, finish, score in groups)
+
+    suitable = window_groups(lambda item: item.status == "good" and item.quality == DataQuality.GOOD, "good")
+    adverse = window_groups(lambda item: not (item.status == "good" and item.quality == DataQuality.GOOD), "adverse")
+    return DayForecastAssessment(
+        start_at, end_at, aggregate, coverage if relevant else None, len(relevant), suitable, adverse,
+        min(values("temperature_c")) if values("temperature_c") else None,
+        max(values("temperature_c")) if values("temperature_c") else None,
+        sum(values("wind_kmh")) / len(values("wind_kmh")) if values("wind_kmh") else None,
+        max(values("wind_kmh")) if values("wind_kmh") else None,
+        max(values("gust_kmh")) if values("gust_kmh") else None,
+        max(values("precipitation_mm")) if values("precipitation_mm") else None,
+        max(values("precipitation_probability_pct")) if values("precipitation_probability_pct") else None,
+        max((item.retrieved_at for item in relevant), default=None),
+    )
+
+
+__all__ = ["DataQuality", "DayForecastAssessment", "ForecastSlot", "ForecastWindow", "RideAssessment", "RideProfile", "RideWindowAssessment", "WeatherObservation", "WeatherSource", "assess_classic", "assess_day_forecast", "assess_ride_window", "assess_score", "choose_metric_observations", "from_ha_forecast", "from_ha_weather_state", "from_openweather", "normalize_rain_rate_mmh", "normalize_temperature_c", "normalize_wind_kmh"]

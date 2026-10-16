@@ -46,7 +46,7 @@ const makeHass = (entries) => {
   card.setConfig({});
   card.hass = hass;
   await wait();
-  assert.deepEqual(calls.map((item) => item.type), ["bike_weather/list_entries", "bike_weather/card_data", "bike_weather/spontaneous_ride"]);
+  assert.deepEqual(calls.map((item) => item.type), ["bike_weather/list_entries", "bike_weather/card_data", "bike_weather/planning_data", "bike_weather/spontaneous_ride"]);
   assert.match(card.shadowRoot.innerHTML, /88/);
 }
 
@@ -103,7 +103,7 @@ const makeHass = (entries) => {
   card.setConfig({entry_id: "two"});
   card.hass = hass;
   await wait();
-  assert.deepEqual(calls.map((item) => item.type), ["bike_weather/list_entries", "bike_weather/card_data", "bike_weather/spontaneous_ride"]);
+  assert.deepEqual(calls.map((item) => item.type), ["bike_weather/list_entries", "bike_weather/card_data", "bike_weather/planning_data", "bike_weather/spontaneous_ride"]);
   assert.equal(calls[1].entry_id, "two");
 }
 

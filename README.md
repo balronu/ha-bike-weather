@@ -4,7 +4,7 @@
 
 🇩🇪 **Deutsch** | [🇬🇧 English](README.en.md)
 
-> **Aktuelle Vorabversion: `v0.2.0-beta.2`.** Installation und Praxistest über HACS erfolgen ausschließlich durch den Nutzer.
+> **Aktuelle Entwicklungsversion: `v0.3.0-beta.1`.** Phase 11A ergänzt regelmäßige Hin-/Rückfahrten und eine Morgenprognose. Installation und Praxistest über HACS erfolgen ausschließlich durch den Nutzer.
 
 ## Überblick
 

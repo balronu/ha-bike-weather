@@ -3,7 +3,9 @@
 Dies ist die kompatible deutsche README-Datei. Die vollständige deutsche
 Dokumentation steht in [README.md](README.md).
 
-Die aktuelle Vorabversion `v0.2.0-beta.2` verbessert den Config Flow mit nativen
+Die aktuelle Entwicklungsversion `v0.3.0-beta.1` ergänzt regelmäßige Fahrten und eine verständliche Morgenprognose. Die spontane Fahrt bleibt erhalten.
+
+Die vorherige Vorabversion `v0.2.0-beta.2` verbessert den Config Flow mit nativen
 EntitySelectoren, erkennt eindeutige lokale Wetterstationssensoren,
 normalisiert °C/°F, km/h/m/s/mph und Regenraten, lokalisiert Provider und
 Options Flow und bringt eine responsive Karte mit visuellem Editor. Zusätzlich

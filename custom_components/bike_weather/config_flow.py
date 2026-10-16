@@ -14,6 +14,7 @@ from homeassistant.helpers.selector import (
     SelectSelector,
     SelectSelectorConfig,
     SelectSelectorMode,
+    TimeSelector,
 )
 
 from .const import *
@@ -118,6 +119,23 @@ def _provider_selector(language: str = "de"):
     )
 
 
+def _weekday_selector(language: str = "de"):
+    labels = ("Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag") if language.split("-")[0] == "de" else ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+    return SelectSelector(SelectSelectorConfig(
+        options=[{"value": str(index), "label": label} for index, label in enumerate(labels)],
+        multiple=True,
+        mode=SelectSelectorMode.DROPDOWN,
+    ))
+
+
+def _duration_selector(language: str = "de"):
+    suffix = "Minuten" if language.split("-")[0] == "de" else "minutes"
+    return SelectSelector(SelectSelectorConfig(
+        options=[{"value": str(value), "label": f"{value} {suffix}"} for value in DEFAULT_RIDE_DURATION_OPTIONS],
+        mode=SelectSelectorMode.DROPDOWN,
+    ))
+
+
 def _suggestions(hass):
     def pick(kind):
         candidates = []
@@ -218,5 +236,15 @@ def _options_schema(values, language: str = "de", suggestions=None):
                 CONF_RIDE_DURATION,
                 default=values.get(CONF_RIDE_DURATION, DEFAULT_RIDE_DURATION),
             ): vol.All(vol.Coerce(int), vol.Range(min=1, max=1440)),
+            vol.Required(CONF_RIDE_OUTBOUND_ENABLED, default=values.get(CONF_RIDE_OUTBOUND_ENABLED, DEFAULT_RIDE_OUTBOUND_ENABLED)): bool,
+            vol.Required(CONF_RIDE_OUTBOUND_NAME, default=values.get(CONF_RIDE_OUTBOUND_NAME, DEFAULT_RIDE_OUTBOUND_NAME)): vol.All(str, vol.Length(min=1, max=64)),
+            vol.Required(CONF_RIDE_OUTBOUND_START, default=values.get(CONF_RIDE_OUTBOUND_START, DEFAULT_RIDE_OUTBOUND_START)): TimeSelector(),
+            vol.Required(CONF_RIDE_OUTBOUND_DURATION, default=str(values.get(CONF_RIDE_OUTBOUND_DURATION, 30))): _duration_selector(language),
+            vol.Required(CONF_RIDE_OUTBOUND_WEEKDAYS, default=[str(day) for day in values.get(CONF_RIDE_OUTBOUND_WEEKDAYS, DEFAULT_RIDE_WEEKDAYS)]): _weekday_selector(language),
+            vol.Required(CONF_RIDE_RETURN_ENABLED, default=values.get(CONF_RIDE_RETURN_ENABLED, DEFAULT_RIDE_RETURN_ENABLED)): bool,
+            vol.Required(CONF_RIDE_RETURN_NAME, default=values.get(CONF_RIDE_RETURN_NAME, DEFAULT_RIDE_RETURN_NAME)): vol.All(str, vol.Length(min=1, max=64)),
+            vol.Required(CONF_RIDE_RETURN_START, default=values.get(CONF_RIDE_RETURN_START, DEFAULT_RIDE_RETURN_START)): TimeSelector(),
+            vol.Required(CONF_RIDE_RETURN_DURATION, default=str(values.get(CONF_RIDE_RETURN_DURATION, 30))): _duration_selector(language),
+            vol.Required(CONF_RIDE_RETURN_WEEKDAYS, default=[str(day) for day in values.get(CONF_RIDE_RETURN_WEEKDAYS, DEFAULT_RIDE_WEEKDAYS)]): _weekday_selector(language),
         }
     )

@@ -18,7 +18,7 @@ async def async_get_config_entry_diagnostics(
     data = coordinator.data if coordinator and coordinator.data else {}
     options = async_redact_data({**entry.data, **entry.options}, TO_REDACT)
     return {
-        "integration_version": "0.3.0",
+        "integration_version": "0.3.1",
         "entry": options,
         "provider": options.get("provider"),
         "sources": data.get("active_sources", []),

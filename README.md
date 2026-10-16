@@ -9,6 +9,10 @@
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://www.hacs.xyz/)
 [![License](https://img.shields.io/github/license/balronu/ha-bike-weather)](LICENSE)
 
+Der Stable-Stand ist v0.3.0. Dieser Branch enthält den Hotfix-Kandidaten
+v0.3.1, der die alte allgemeine Forecast-Darstellung vollständig aus der
+Karte entfernt.
+
 Bike Weather bewertet anhand lokaler Wetterdaten und verfügbarer Prognosen,
 wie gut sich das Wetter zum Fahrradfahren eignet. Die Bewertung von 0 bis 100
 bleibt nachvollziehbar: fehlende oder veraltete Werte werden als unbekannt

@@ -9,6 +9,10 @@
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://www.hacs.xyz/)
 [![License](https://img.shields.io/github/license/balronu/ha-bike-weather)](LICENSE)
 
+The Stable release is v0.3.0. This branch contains the v0.3.1 hotfix
+candidate, which removes the obsolete general forecast rendering from the
+card completely.
+
 Bike Weather evaluates how suitable the weather is for cycling using local
 weather data and available forecasts. Scores from 0 to 100 remain explainable:
 missing or stale values are shown as unknown or limited quality instead of

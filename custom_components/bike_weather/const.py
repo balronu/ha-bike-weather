@@ -37,11 +37,12 @@ DEFAULT_MIN_TEMPERATURE = 10.0
 DEFAULT_MAX_WIND = 15.0
 DEFAULT_MAX_RAIN = 0.0
 DEFAULT_MIN_SCORE = 70
-DEFAULT_RIDE_START = "07:30"
+DEFAULT_RIDE_START = "15:00"
 DEFAULT_RIDE_DURATION = 60
 DEFAULT_PROFILE = "standard"
 DEFAULT_UPDATE_INTERVAL = timedelta(minutes=DEFAULT_REFRESH_MINUTES)
 CARD_URL = "/bike_weather/bike-weather-card.js"
 WS_CARD_DATA = "bike_weather/card_data"
+WS_SPONTANEOUS_RIDE = "bike_weather/spontaneous_ride"
 WS_LIST_ENTRIES = "bike_weather/list_entries"
-CARD_VERSION = "0.1.0-beta.7"
+CARD_VERSION = "0.2.0-beta.1"

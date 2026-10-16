@@ -45,7 +45,7 @@ class DiscoveryApiTests(unittest.IsolatedAsyncioTestCase):
         finally:
             api.websocket_api.async_register_command = original
 
-        self.assertEqual(registered, ["_card_data", "_list_entries"])
+        self.assertEqual(registered, ["_card_data", "_list_entries", "_spontaneous_ride"])
 
     async def test_list_entries_returns_only_non_secret_discovery_fields(self):
         hass = _Hass(

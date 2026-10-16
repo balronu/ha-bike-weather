@@ -35,7 +35,14 @@ unknown suitability status, together with the missing factor. This is kept
 distinct from a temporal forecast gap or completely missing forecast data;
 hourly forecasts are never interpolated into false minute precision.
 
-## Beta 7 features
+## Features in the current beta `v0.3.0-beta.1`
+
+- independent regular outbound and return rides with weekdays, times and duration;
+- a conservative tomorrow forecast for 06:00–22:00;
+- shared score logic for regular, tomorrow and spontaneous rides;
+- clear states for rides that are not planned today or have already passed.
+
+The following features from the Beta 7 line remain included:
 
 - native EntitySelectors instead of free-form entity IDs;
 - automatic selection only when exactly one compatible sensor is found;
@@ -104,7 +111,7 @@ The conservative weighted score uses temperature, wind, gusts, rain,
 precipitation probability and apparent temperature. Missing factors lower
 data quality and cannot produce an unrestricted positive result. Local and
 Home Assistant weather data stay local; OpenWeatherMap is contacted only
-when explicitly selected. This branch is not a stable release and has no
+when explicitly selected. `v0.3.0-beta.1` is not a stable release and has no
 productive HA runtime validation or real production screenshots.
 
 ## Development and tests

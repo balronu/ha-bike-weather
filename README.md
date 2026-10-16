@@ -42,7 +42,14 @@ zeigt die Karte den Teilscore mit Datenqualität `eingeschränkt` und Status
 Forecast-Lücke oder vollständig fehlenden Prognosedaten getrennt; stündliche
 Forecasts werden nicht künstlich auf Minuten interpoliert.
 
-## Beta-7-Funktionen
+## Funktionen der aktuellen Beta `v0.3.0-beta.1`
+
+- regelmäßige Hin- und Rückfahrten mit Wochentagen, Uhrzeiten und Dauer;
+- konservative Morgenprognose für 06:00–22:00;
+- gemeinsame Scorelogik für regelmäßige, morgige und spontane Fahrten;
+- klare Zustände für nicht geplante oder bereits vergangene Fahrten.
+
+Die folgenden Funktionen aus der Beta-7-Linie bleiben ebenfalls enthalten:
 
 - native EntitySelectoren statt freier Entity-ID-Eingabe;
 - eindeutige Vorauswahl kompatibler lokaler Sensoren;
@@ -139,7 +146,7 @@ werden durch Tests abgesichert.
 
 Lokale Sensoren und Home-Assistant-Wetterdaten bleiben lokal. OpenWeatherMap
 wird nur bei ausdrücklicher Auswahl und mit eigenem API-Schlüssel kontaktiert.
-Beta 7 ist nicht als Stable freigegeben. Produktive HA-Installation,
+`v0.3.0-beta.1` ist nicht als Stable freigegeben. Produktive HA-Installation,
 HACS-Update und Praxistest sind nicht Bestandteil dieses Branches.
 
 ## Entwicklung und Tests

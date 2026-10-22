@@ -57,7 +57,8 @@ def test_branding_dimensions_and_card_version():
             handle.read(16)
             return struct.unpack(">II", handle.read(8))
 
-    assert size(INTEGRATION / "brand" / "icon.png") == (512, 512)
+    assert size(INTEGRATION / "brand" / "icon.png") == (256, 256)
+    assert size(INTEGRATION / "brand" / "icon@2x.png") == (512, 512)
     assert size(ROOT / "assets" / "branding" / "readme-banner.png") == (1280, 320)
     assert size(ROOT / "assets" / "branding" / "social-preview.png") == (1280, 640)
     card = (INTEGRATION / "www" / "bike-weather-card.js").read_text()
